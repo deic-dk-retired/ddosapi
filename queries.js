@@ -31,7 +31,7 @@ function getAllAdmins(req, res, next) {
 }
 
 function getSingleAdmin(req, res, next) {
-  var pupID = parseInt(req.params.id);
+  var adminID = parseInt(req.params.id);
   db.one('SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where administratorid = $1', adminID)
     .then(function (data) {
       res.status(200)
@@ -80,7 +80,7 @@ function getSingleAdmin(req, res, next) {
 // }
 
 function removeAdmin(req, res, next) {
-  var pupID = parseInt(req.params.id);
+  var adminID = parseInt(req.params.id);
   db.result('delete from flow.administrators where administratorid = $1', adminID)
     .then(function (result) {
       /* jshint ignore:start */
