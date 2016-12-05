@@ -1,0 +1,19 @@
+{
+  "name": "node-ddos",
+  "version": "1.0.0",
+  "description": "node app to generate JSON apis from PostgreSQL",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "author": "Ashokaditya",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "morgan": "^1.7.0",
+    "pg": "^6.1.0",
+    "pg-promise": "^5.4.5"
+  }
+}
