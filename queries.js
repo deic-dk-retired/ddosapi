@@ -5,7 +5,6 @@
 // var client = new pg.Client(connStr);
 // var sql = "SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where valid = 'TRUE' order by username ASC";
 // var data = "";
-
 var promise = require('bluebird');
 var options = {
   // Initialization Options
@@ -32,7 +31,7 @@ function getAllAdmins(req, res, next) {
 
 function getSingleAdmin(req, res, next) {
   var adminID = parseInt(req.params.id);
-  db.one('SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where administratorid = $1', adminID)
+  db.one("SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where administratorid = $1", adminID)
     .then(function (data) {
       res.status(200)
         .json({
@@ -46,42 +45,41 @@ function getSingleAdmin(req, res, next) {
     });
 }
 
-// function createAdmin(req, res, next) {
-//   req.body.age = parseInt(req.body.age);
-//   db.none('insert into pups(name, breed, age, sex)' +
-//       'values(${name}, ${breed}, ${age}, ${sex})',
-//     req.body)
-//     .then(function () {
-//       res.status(200)
-//         .json({
-//           status: 'success',
-//           message: 'Inserted one puppy'
-//         });
-//     })
-//     .catch(function (err) {
-//       return next(err);
-//     });
-// }
+function createAdmin(req, res, next) {
+  // req.body.age = parseInt(req.body.age);
+  db.none("insert into flow.administrators (customerid, kind, name, phone, username, password, valid, lastlogin, lastpasswordchange)" +
+      "values(${customerid}, ${kind}, ${name}, ${phone}, ${username}, crypt(${password}, gen_salt('bf', 10)), true, now(), now())",
+    req.body)
+    .then(function () {
+      res.status(200)
+        .json({
+          status: 'success',
+          message: 'Inserted one Administrator'
+        });
+    })
+    .catch(function (err) {
+      return next(err);
+    });
+}
 
-// function updateAdmin(req, res, next) {
-//   db.none('update pups set name=$1, breed=$2, age=$3, sex=$4 where id=$5',
-//     [req.body.name, req.body.breed, parseInt(req.body.age),
-//       req.body.sex, parseInt(req.params.id)])
-//     .then(function () {
-//       res.status(200)
-//         .json({
-//           status: 'success',
-//           message: 'Updated puppy'
-//         });
-//     })
-//     .catch(function (err) {
-//       return next(err);
-//     });
-// }
+function updateAdmin(req, res, next) {
+  db.none("update flow.administrators set customerid=$1, kind=$2, name=$3, phone=$4, username=$5, password=crypt($6, gen_salt('bf', 10)) where id=$7",
+    [req.body.customerid, req.body.kind, req.body.name, req.body.phone, req.body.username, req.body.password])
+    .then(function () {
+      res.status(200)
+        .json({
+          status: 'success',
+          message: 'Updated Admin'
+        });
+    })
+    .catch(function (err) {
+      return next(err);
+    });
+}
 
 function removeAdmin(req, res, next) {
   var adminID = parseInt(req.params.id);
-  db.result('delete from flow.administrators where administratorid = $1', adminID)
+  db.result("delete from flow.administrators where administratorid = $1", adminID)
     .then(function (result) {
       /* jshint ignore:start */
       res.status(200)
@@ -100,7 +98,7 @@ function removeAdmin(req, res, next) {
 module.exports = {
   getAllAdmins: getAllAdmins,
   getSingleAdmin: getSingleAdmin,
-  // createPuppy: createPuppy,
+  createAdmin: createAdmin,
   // updatePuppy: updatePuppy,
   removeAdmin: removeAdmin
 };
