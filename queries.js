@@ -1,10 +1,3 @@
-// var pg = require('pg');
-// var pgp = require('pg-promise');
-
-// var connStr = 'postgres:flowuser:Gbr(Ff)wCJOF@localhost/netflow';
-// var client = new pg.Client(connStr);
-// var sql = "SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where valid = 'TRUE' order by username ASC";
-// var data = "";
 var promise = require('bluebird');
 var options = {
   // Initialization Options
@@ -15,7 +8,7 @@ var connectionString =  'postgres:flowuser:Gbr(Ff)wCJOF@localhost/netflow';
 var db = pgp(connectionString);
 
 function getAllAdmins(req, res, next) {
-  db.any("SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where valid = 'TRUE' order by username ASC")
+  db.any("SELECT administratorid as userid, customerid as custid, kind, name, username FROM flow.administrators WHERE valid = 'TRUE' order by username ASC")
     .then(function (data) {
       res.status(200)
         .json({
@@ -29,9 +22,9 @@ function getAllAdmins(req, res, next) {
     });
 }
 
-function getSingleAdmin(req, res, next) {
+function getOneAdmin(req, res, next) {
   var adminID = parseInt(req.params.id);
-  db.one("SELECT administratorid as userid, customerid as custid, kind, name, username from flow.administrators where administratorid = $1", adminID)
+  db.one("SELECT administratorid as userid, customerid as custid, kind, name, username FROM flow.administrators WHERE administratorid = $1", adminID)
     .then(function (data) {
       res.status(200)
         .json({
@@ -47,8 +40,8 @@ function getSingleAdmin(req, res, next) {
 
 function createAdmin(req, res, next) {
   // req.body.age = parseInt(req.body.age);
-  db.none("insert into flow.administrators (customerid, kind, name, phone, username, password, valid, lastlogin, lastpasswordchange)" +
-      "values(${customerid}, ${kind}, ${name}, ${phone}, ${username}, crypt(${password}, gen_salt('bf', 10)), true, now(), now())",
+  db.none("INSERT INTO flow.administrators (customerid, kind, name, phone, username, password, valid, lastlogin, lastpasswordchange)" +
+      "VALUES(${customerid}, ${kind}, ${name}, ${phone}, ${username}, crypt(${password}, gen_salt('bf', 10)), true, now(), now())",
     req.body)
     .then(function () {
       res.status(200)
@@ -63,7 +56,7 @@ function createAdmin(req, res, next) {
 }
 
 function updateAdmin(req, res, next) {
-  db.none("update flow.administrators set customerid=$1, kind=$2, name=$3, phone=$4, username=$5, password=crypt($6, gen_salt('bf', 10)) where id=$7",
+  db.none("UPDATE flow.administrators SET customerid=$1, kind=$2, name=$3, phone=$4, username=$5, password=crypt($6, gen_salt('bf', 10)) WHERE id=$7",
     [req.body.customerid, req.body.kind, req.body.name, req.body.phone, req.body.username, req.body.password])
     .then(function () {
       res.status(200)
@@ -79,26 +72,57 @@ function updateAdmin(req, res, next) {
 
 function removeAdmin(req, res, next) {
   var adminID = parseInt(req.params.id);
-  db.result("delete from flow.administrators where administratorid = $1", adminID)
+  db.result("DELETE from flow.administrators WHERE administratorid = $1", adminID)
     .then(function (result) {
-      /* jshint ignore:start */
       res.status(200)
         .json({
           status: 'success',
-          message: `Removed ${result.rowCount} puppy`
+          message: 'Removed ${result.rowCount} Admin'
         });
-      /* jshint ignore:end */
     })
     .catch(function (err) {
       return next(err);
     });
 }
 
+function getAllRules(req, res, next) {
+  // var adminID = parseInt(req.params.id);
+  db.any("SELECT flowspecruleid \"ruleid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid not in ( select t.flowspecruleid  from flow.flowspecrules AS t WHERE t.flowspecruleid not in (SELECT distinct x.flowspecruleid FROM flow.flowspecrules AS x WHERE srcordestport = destinationport)) ORDER BY ruleid DESC")
+    .then(function (data) {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: data,
+          message: 'Retrieved all rules'
+        });
+    })
+    .catch(function (err) {
+      return next(err);
+    });
+}
+
+function getOneRule(req, res, next) {
+  var ruleId = parseInt(req.params.id);
+  db.one("SELECT flowspecruleid \"ruleid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid = $1", ruleId)
+    .then(function (data) {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: data,
+          message: 'Retrieved one rule'
+        });
+    })
+    .catch(function (err) {
+      return next(err);
+    });
+}
 
 module.exports = {
   getAllAdmins: getAllAdmins,
-  getSingleAdmin: getSingleAdmin,
+  getOneAdmin: getOneAdmin,
   createAdmin: createAdmin,
-  // updatePuppy: updatePuppy,
-  removeAdmin: removeAdmin
+  updateAdmin: updateAdmin,
+  removeAdmin: removeAdmin,
+  getAllRules: getAllRules,
+  getOneRule: getOneRule
 };

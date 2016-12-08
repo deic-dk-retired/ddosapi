@@ -9,7 +9,6 @@ var routes = require('./routes/index');
 
 var app = express();
 
-
 app.use(function(req, res, next) {
   res.removeHeader("X-Powered-By");
   next();
