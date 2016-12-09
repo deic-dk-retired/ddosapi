@@ -87,7 +87,7 @@ function removeAdmin(req, res, next) {
 
 function getAllRules(req, res, next) {
   // var adminID = parseInt(req.params.id);
-  db.any("SELECT flowspecruleid \"ruleid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid not in ( select t.flowspecruleid  from flow.flowspecrules AS t WHERE t.flowspecruleid not in (SELECT distinct x.flowspecruleid FROM flow.flowspecrules AS x WHERE srcordestport = destinationport)) ORDER BY ruleid DESC")
+  db.any("SELECT flowspecruleid \"ruleid\", customerid \"custid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid not in ( select t.flowspecruleid  from flow.flowspecrules AS t WHERE t.flowspecruleid not in (SELECT distinct x.flowspecruleid FROM flow.flowspecrules AS x WHERE srcordestport = destinationport)) ORDER BY ruleid DESC")
     .then(function (data) {
       res.status(200)
         .json({
@@ -103,7 +103,7 @@ function getAllRules(req, res, next) {
 
 function getOneRule(req, res, next) {
   var ruleId = parseInt(req.params.id);
-  db.one("SELECT flowspecruleid \"ruleid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid = $1", ruleId)
+  db.one("SELECT flowspecruleid \"ruleid\", customerid \"custid\", customernetworkid \"custnetid\", rule_name \"rname\", administratorid \"adminid\", direction \"direct\", validfrom \"fromdate\", validto \"todate\", fastnetmoninstanceid \"fmonid\", isactivated \"active\", isexpired \"expired\", destinationprefix \"destpre\", sourceprefix \"sourcepre\", ipprotocol \"protocol\", destinationport \"destpt\", sourceport \"srcpt\", packetlength \"pktlen\" FROM flow.flowspecrules AS f WHERE f.flowspecruleid = $1", ruleId)
     .then(function (data) {
       res.status(200)
         .json({
