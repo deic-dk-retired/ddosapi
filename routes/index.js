@@ -1,15 +1,20 @@
 var express = require('express');
 var router = express.Router();
 
-var db = require('../queries');
+// var db = require('../queries');
+var admins = require('../admins');
+var rules = require('../rules');
 
-router.get('/api/admins', db.getAllAdmins);
-router.get('/api/admins/:id', db.getOneAdmin);
-router.post('/api/admins', db.createAdmin);
-router.put('/api/admins/:id', db.updateAdmin);
-router.delete('/api/admins/:id', db.removeAdmin);
+router.get('/api/login/:usr/:pass', admins.verifyAccess);
+router.get('/api/admins', admins.getAllAdmins);
+router.get('/api/admins/:usr', admins.getOneAdmin);
+router.post('/api/admins', admins.createAdmin);
+router.put('/api/admins/:usr', admins.updateAdmin);
+router.delete('/api/admins/:usr', admins.removeAdmin);
 
-router.get('/api/rules', db.getAllRules);
-router.get('/api/rules/:id', db.getOneRule);
+router.get('/api/rules/all', rules.getAllRules);
+router.get('/api/rules', rules.getRulesByIP);
+router.get('/api/rules/:id', rules.getRuleByID);
+router.post('/api/rules', rules.createRule);
 
 module.exports = router;
