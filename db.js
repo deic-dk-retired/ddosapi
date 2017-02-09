@@ -12,12 +12,7 @@ function sql(file) {
   return new pgp.QueryFile(file, {minify: true});
 }
 
-function getSeries(file) {
-  // consider using here: path.join(__dirname, file)
-  return new pgp.QueryFile(file, {minify: true});
-}
-
 module.exports = {
-  foddb: fodDb
+  foddb : fodDb
 , query : sql
 };

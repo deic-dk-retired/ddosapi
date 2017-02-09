@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-// var db = require('../queries');
-var admins = require('../admins');
-var rules = require('../rules');
+var admins = require('../admins'),
+    rules = require('../rules'),
+    fnm = require('../fnm');
 
 router.get('/api/login/:usr/:pass', admins.verifyAccess);
 router.get('/api/admins', admins.getAllAdmins);
@@ -16,5 +16,7 @@ router.get('/api/rules/all', rules.getAllRules);
 router.get('/api/rules', rules.getRulesByIP);
 router.get('/api/rules/:id', rules.getRuleByID);
 router.post('/api/rules', rules.createRule);
+
+router.get('/api/series/:series', fnm.getSeries);
 
 module.exports = router;
