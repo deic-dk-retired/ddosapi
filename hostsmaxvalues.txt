@@ -1,1 +1,1 @@
-select max(value::float) from graphite.autogen.hosts where direction = 'incoming' and  time > now() - 10h group by resource, time(1m) order by time desc
+select max(value::float) from graphite.autogen.hosts where direction = 'incoming' and  time > now() - 1d group by resource, time(1h) order by time desc
