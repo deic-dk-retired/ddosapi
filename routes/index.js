@@ -17,6 +17,7 @@ router.get('/api/rules', rules.getRulesByIP);
 router.get('/api/rules/:id', rules.getRuleByID);
 router.post('/api/rules', rules.createRule);
 
-router.get('/api/series/:series', fnm.getSeries);
+// router.get('/api/series/:series', fnm.getSeries);
+router.get('/api/series/:series', fnm.getAllSeries);
 
 module.exports = router;
