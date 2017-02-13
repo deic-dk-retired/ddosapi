@@ -9,7 +9,7 @@ var promise = require('bluebird')
 
 function sql(file) {
   // consider using here: path.join(__dirname, file)
-  console.log(new pgp.QueryFile(file, {minify: true}))
+  // console.log(new pgp.QueryFile(file, {minify: true}))
   return new pgp.QueryFile(file, {minify: true});
 }
 
