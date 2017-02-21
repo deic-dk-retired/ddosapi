@@ -37,6 +37,7 @@ function getAllAdmins(req, res, next) {
 
 function getOneAdmin(req, res, next) {
   var sqlOneAdmin = db.query('../sql/oneAdmin.sql');
+  // console.log(sqlOneAdmin);
   db.foddb.one(sqlOneAdmin, {usr: req.params.usr})
     .then(function (data) {
       res.status(200)

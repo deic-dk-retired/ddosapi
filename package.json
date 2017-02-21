@@ -15,14 +15,14 @@
     "express": "^4.14.0",
     "express-session": "^1.15.0",
     "got": "^6.7.1",
+    "influx": "^5.0.4",
+    "influxdb-nodejs": "^2.5.1",
     "method-override": "^2.3.7",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
     "pg-promise": "^5.4.5",
-    "request": "^2.79.0",
-    "request-promise": "^4.1.1",
     "serve-favicon": "^2.3.2"
   },
   "devDependencies": {
