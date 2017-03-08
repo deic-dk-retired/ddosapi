@@ -19,4 +19,6 @@ VALUES
   true,
   null,
   now()
-)
+);
+
+COMMIT;

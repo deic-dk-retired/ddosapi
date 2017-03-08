@@ -7,4 +7,4 @@ username=${usr},
 password=crypt(${pwd}, gen_salt('bf', 10))
 WHERE username = ${usr};
 
-commit;
+COMMIT;
