@@ -36,14 +36,14 @@ var db = require('./db')
 
 /*
 */
-function partial (fn, str1, str2) {
-  var slice = Array.prototype.slice
-  // slice arguments of partial
-  var args = slice.call(arguments, 1)
-  return function () {
-    return fn.apply(this, args.concat(slice.call(arguments)))
-  }
-}
+// function partial (fn, str1, str2) {
+//   var slice = Array.prototype.slice
+//   // slice arguments of partial
+//   var args = slice.call(arguments, 1)
+//   return function () {
+//     return fn.apply(this, args.concat(slice.call(arguments)))
+//   }
+// }
 
 /*
 uses default influx
@@ -59,7 +59,8 @@ function getSeries (req, res, next) {
       .json({
         status: 'success',
         data: data,
-        message: 'Retrieved requested series'
+        size: data.length,
+        message: 'Retrieved requested series from query file'
       })
     })
     .catch(function (err) {
@@ -79,6 +80,7 @@ function getOneSeries (req, res, next) {
     .json({
       status: 'success',
       data: data,
+      size: data.length,
       message: 'Retrieved requested series'
     })
   })
@@ -91,7 +93,7 @@ function getOneSeries (req, res, next) {
 uses npm influx on static query file
 */
 function getGrpSeries (req, res, next) {
-  var qryfile = 'hostsmaxvalues.sql'
+  var qryfile = 'qf-hosts-mx-val.sql'
   var getAllSeries = db.query('../influxql/' + qryfile)
   // console.log(getAllSeries.query);
   db.influx.query(getAllSeries.query)
@@ -101,6 +103,7 @@ function getGrpSeries (req, res, next) {
     .json({
       status: 'success',
       data: data,
+      size: data.length,
       message: 'Retrieved requested series'
     })
   })

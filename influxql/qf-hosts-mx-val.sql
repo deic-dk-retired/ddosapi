@@ -1,4 +1,4 @@
-select max(value::float)
+select max(value::float) as y, time as x
 from graphite.autogen.hosts
 where direction = 'incoming'
 and time > now() - 1w

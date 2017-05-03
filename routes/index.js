@@ -1,11 +1,19 @@
 var express = require('express')
 var router = express.Router()
 
+var icmp = require('../icmp')
 var admins = require('../admins')
 var rules = require('../rules')
 var fnm = require('../fnm')
 
 // router.get('/')
+
+/*
+map urls to functions
+for icmp types and codes
+*/
+router.get('/api/icmp', icmp.getTypesICMP)
+router.get('/api/icmp/:type', icmp.getTypesICMP)
 
 /*
 map urls to functions

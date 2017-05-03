@@ -7,7 +7,7 @@ SELECT DISTINCT
       ELSE protocol
     END AS protocol,
   fromdate,
-  to_date(fromdate, 'FMMon FMDD, ''YY'),
+  to_date(fromdate, 'YYYY-MM-DD') "formatted_frmdate",
   trim(max(fromtime)) maxfromtime,
   trim(todate) todate,
   sourcepre,
@@ -20,15 +20,14 @@ FROM(
   SELECT
     flowspecruleid "ruleid",
     f.customerid "custid",
-    customernetworkid "custnetid",
     rule_name "rname",
     f.administratorid "adminid",
     a.name "admname",
     direction "direct",
     validfrom,
-    to_char(validfrom, 'FMMon FMDD, ''YY') "fromdate",
+    to_char(validfrom, 'YYYY-MM-DD') "fromdate",
     to_char(validfrom, 'HH24:MI:SS') "fromtime",
-    to_char(validto, 'FMMon FMDD, ''YY') "todate",
+    to_char(validto, 'YYYY-MM-DD') "todate",
     to_char(validto, 'HH24:MI:SS') "totime",
     age(validto, validfrom) "duration",
     EXTRACT(HOUR FROM age(validto, validfrom)) "dhrs",
@@ -69,10 +68,10 @@ FROM(
     admname,
     protocol,
     fromdate,
-    to_date(fromdate, 'FMMon FMDD, ''YY'),
+    "formatted_frmdate",
     todate,
     sourcepre,
     destpre,
     pktlen,
     active
-  ORDER BY to_date(fromdate, 'FMMon FMDD, ''YY') DESC
+  ORDER BY "formatted_frmdate" DESC

@@ -10,6 +10,7 @@ function verifyAccess (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Compared username'
         })
     })
@@ -26,6 +27,7 @@ function getAllAdmins (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Retrieved ALL Administrators'
         })
     })
@@ -44,6 +46,7 @@ function getOneAdmin (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Retrieved ONE Administrator'
         })
     })

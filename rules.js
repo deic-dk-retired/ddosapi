@@ -10,6 +10,7 @@ function getAllRules (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Retrieved all rules'
         })
     })
@@ -26,6 +27,7 @@ function getRulesByIP (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Retrieved all rules grouped by IP'
         })
     })
@@ -43,6 +45,7 @@ function getRuleByID (req, res, next) {
         .json({
           status: 'success',
           data: data,
+          size: data.length,
           message: 'Retrieved one rule by ID'
         })
     })
@@ -59,6 +62,7 @@ function createRule (req, res, next) {
       res.status(200)
         .json({
           status: 'success',
+          size: data.length,
           message: 'Inserted one rule'
         })
     })
