@@ -2,7 +2,6 @@ SELECT
   ruleid,
   custid,
   c.companyname,
-  custnetid,
   rname,
   adminid,
   admname,
@@ -26,7 +25,6 @@ FROM (
   SELECT
   flowspecruleid "ruleid",
   f.customerid "custid",
-  customernetworkid "custnetid",
   rule_name "rname",
   f.administratorid "adminid",
   a.name "admname",

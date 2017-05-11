@@ -3,48 +3,6 @@
 // retrieve data from curl and return
 // expose the function to be used in router
 var db = require('./db')
-// var path = require('path');
-// var fs = require('fs');
-// var got = require('got')
-// var request = require("request");
-// var influxurl = 'http://172.22.89.2:8086/query'
-// var qpar = '?q='
-  // , querystr
-
-// read json data from fastnetmon instance
-// using curl or something similar
-// catch the json output pass it on here.
-// function getSeries(req, res, next) {
-//   var str;
-//   var file = req.params.series +'.txt';
-//   str = buildQueryStr(file);
-//   got(str)
-//     .then(function (data) {
-//       var dataObj = JSON.parse(data.body);
-//       // console.log("data type: " + (typeof dataObj) );
-//       res.status(200)
-//       .json({
-//         status: 'success',
-//         message: 'Retrieved requested series',
-//         data: dataObj["results"][0]["series"]
-//       });
-//     })
-//     .catch(function (err) {
-//       return next(err.message);
-//     });
-// }
-
-/*
-*/
-// function partial (fn, str1, str2) {
-//   var slice = Array.prototype.slice
-//   // slice arguments of partial
-//   var args = slice.call(arguments, 1)
-//   return function () {
-//     return fn.apply(this, args.concat(slice.call(arguments)))
-//   }
-// }
-
 /*
 uses default influx
 and pulls from static query file
@@ -61,6 +19,25 @@ function getSeries (req, res, next) {
         data: data,
         size: data.length,
         message: 'Retrieved requested series from query file'
+      })
+    })
+    .catch(function (err) {
+      return next(err.message)
+    })
+}
+
+function getSeriesWithTime (req, res, next) {
+  var qryfile = req.params.qryfile + '.sql'
+  var topn = parseInt(req.params.num)
+  var getAllSeries = db.query('../influxql/' + qryfile)
+  db.influx.query(getAllSeries.query, {num: topn, tfrom: req.params.tmfrm, tuntil: req.params.tmto})
+    .then(function (data) {
+      res.status(200)
+      .json({
+        status: 'success',
+        data: data,
+        size: data.length,
+        message: 'Retrieved requested series from query file with time intervals'
       })
     })
     .catch(function (err) {
@@ -114,6 +91,7 @@ function getGrpSeries (req, res, next) {
 
 module.exports = {
   getSeries: getSeries,
+  getSeriesWithTime: getSeriesWithTime,
   getOneSeries: getOneSeries,
   getGrpSeries: getGrpSeries
 }

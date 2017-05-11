@@ -31,7 +31,7 @@ influx.getDatabaseNames()
   return err.message
 })
 
-function sql (file) {
+function query (file) {
   // consider using here: path.join(__dirname, file)
   return new pgp.QueryFile(file, {minify: true})
 }
@@ -40,5 +40,5 @@ module.exports = {
   foddb: fodDb,
   influx: influx,
   graphite: client,
-  query: sql
+  query: query
 }
