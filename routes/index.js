@@ -41,8 +41,8 @@ for time series data
 */
 router.get('/api/series/:qryfile', fnm.getSeries)
 router.get('/api/series/raw/:qryfile', fnm.getSeriesWithTime)
-router.get('/api/series/hosts/group', fnm.getGrpSeries)
-router.get('/api/series/hosts/one', fnm.getOneSeries)
+// router.get('/api/series/hosts/group', fnm.getGrpSeries)
+// router.get('/api/series/hosts/one', fnm.getOneSeries)
 // router.get('/api/series/:series', fnm.getAllSeries);
 
 /*

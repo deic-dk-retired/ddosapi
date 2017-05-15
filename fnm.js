@@ -101,7 +101,7 @@ function getGrpSeries (req, res, next) {
 
 module.exports = {
   getSeries: getSeries,
-  getSeriesWithTime: getSeriesWithTime,
-  getOneSeries: getOneSeries,
-  getGrpSeries: getGrpSeries
+  getSeriesWithTime: getSeriesWithTime
+  // getOneSeries: getOneSeries,
+  // getGrpSeries: getGrpSeries
 }
