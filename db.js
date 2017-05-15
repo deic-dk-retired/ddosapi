@@ -18,7 +18,7 @@ var influxClient = new Influx.InfluxDB({
 // show all the dbs listening on
 influxClient.getDatabaseNames()
 .then(function (names) {
-  console.log('c1 ' + names.join(', '))
+  console.log('stream1: ' + names.join(', '))
   if (!names.includes('graphite')) {
     console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
   } else {
@@ -26,11 +26,11 @@ influxClient.getDatabaseNames()
   }
 })
 .catch(function (err) {
-  console.error('Error looking up graphite!')
+  console.error('Error looking up graphite unsing influx!')
   return err.message
 })
 
-/* using another npm package */
+/* using influxdb-nodejs package */
 var Influxnode = require('influxdb-nodejs')
 var InfluxnodeClient = new Influxnode('http://172.22.89.2:8086/graphite')
 // check for db graphite
@@ -38,7 +38,7 @@ var InfluxnodeClient = new Influxnode('http://172.22.89.2:8086/graphite')
 // show all the dbs listening on
 InfluxnodeClient.showDatabases()
 .then(function (names) {
-  console.log('c2 ' + names.join(', '))
+  console.log('stream2: ' + names.join(', '))
   if (!names.includes('graphite')) {
     console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
   } else {
@@ -46,7 +46,7 @@ InfluxnodeClient.showDatabases()
   }
 })
 .catch(function (err) {
-  console.error('Error looking up graphite!')
+  console.error('Error looking up graphite using influxdb-nodejs!')
   return err.message
 })
 

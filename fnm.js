@@ -3,12 +3,18 @@
  *    Expose tis function to be used in router.
  * 2. Build dynamic influx queries using influxdb-nodejs api
  */
-
 var db = require('./db')
 /* uses default influx and pull from static query file from given url param */
 function getSeries (req, res, next) {
   var qryfile = req.params.qryfile + '.sql'
-  // store minified queryfile into a variable
+  /**
+   * store minified queryfile object into a variable
+   * QueryFile {
+      file: "filename.sql"
+      options: {"debug":false,"minify":true,"compress":false}
+      query: "select * from ..."
+    }
+   */
   var getAllSeries = db.miniQuery('../influxql/' + qryfile)
   db.influxClient.query(getAllSeries.query)
     .then(function (data) {
@@ -27,27 +33,23 @@ function getSeries (req, res, next) {
 
 function getSeriesWithTime (req, res, next) {
   var qryfile = req.params.qryfile + '.sql'
-  var topn = parseInt(req.params.num)
+  // var topn = parseInt(req.params.num)
   var getAllSeries = db.miniQuery('../influxql/' + qryfile)
-  // from nth day to n-x days going backwards e.g. 5days ago to 6days ago
-  // gives data for 6 days ago thus "tmfrm < tuntil"
-  // select * from graphite.autogen.hosts where resource='bps' and time < now() - 5d and time > now() - 6d and direction='incoming'
-  db.influxnodeClient.query('graphite.autogen.hosts')
-    .where('resource', 'bps')
-    .where('direction', 'incoming')
-  // .where('time', req.params.tmfrm, '<')
-  // .where('time', req.params.tmto, '>')
-  // .where('direction', 'incoming')
-  // .addFunction('top', 'value', topn)
-  .then(function (data) {
-    res.status(200)
-      .json({
-        status: 'success',
-        data: data,
-        size: data.length,
-        message: 'Retrieved requested series from query file with time intervals'
-      })
-  })
+  /**
+   * from nth day to n-x days going backwards e.g. 5days ago to 6days ago
+   * gives data for 6 days ago thus "tmfrm < tuntil"
+   */
+  db.influxnodeClient.queryRaw(getAllSeries.query)
+    .then(function (data) {
+      console.log(data)
+      res.status(200)
+        .json({
+          status: 'success',
+          data: data,
+          size: data.length,
+          message: 'Retrieved requested series from query file with time intervals'
+        })
+    })
     .catch(function (err) {
       return next(err.message)
     })
