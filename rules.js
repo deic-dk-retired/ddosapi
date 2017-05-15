@@ -3,7 +3,7 @@
 var db = require('./db')
 
 function getAllRules (req, res, next) {
-  var sqlGetAllRules = db.query('../sql/getAllRules.sql')
+  var sqlGetAllRules = db.miniQuery('../sql/getAllRules.sql')
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
       res.status(200)
@@ -20,7 +20,7 @@ function getAllRules (req, res, next) {
 }
 
 function getRulesByIP (req, res, next) {
-  var sqlAllRulesByIP = db.query('../sql/allRulesByIP.sql')
+  var sqlAllRulesByIP = db.miniQuery('../sql/allRulesByIP.sql')
   db.foddb.any(sqlAllRulesByIP)
     .then(function (data) {
       res.status(200)
@@ -38,7 +38,7 @@ function getRulesByIP (req, res, next) {
 
 function getRuleByID (req, res, next) {
   var ruleId = parseInt(req.params.id)
-  var sqlRuleByID = db.query('../sql/RuleByID.sql')
+  var sqlRuleByID = db.miniQuery('../sql/RuleByID.sql')
   db.foddb.one(sqlRuleByID, {id: ruleId})
     .then(function (data) {
       res.status(200)

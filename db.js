@@ -7,23 +7,22 @@ var pgp = require('pg-promise')(options)
 var connectStringFod = 'postgres:flowuser:Gbr(Ff)wCJOF@localhost/netflow'
 var fodDb = pgp(connectStringFod)
 
+/* using official npm package */
 var Influx = require('influx')
-var influx = new Influx.InfluxDB({
+var influxClient = new Influx.InfluxDB({
   host: '172.22.89.2',
   database: 'graphite'
 })
-
-var Influxnode = require('influxdb-nodejs')
-var client = new Influxnode('http://172.22.89.2:8086/graphite')
-
 // check for db graphite
-// on influxdb
-influx.getDatabaseNames()
+// on influxdb and
+// show all the dbs listening on
+influxClient.getDatabaseNames()
 .then(function (names) {
+  console.log('c1 ' + names.join(', '))
   if (!names.includes('graphite')) {
-    console.log('graphite not found')
+    console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
   } else {
-    console.log('Listening on ' + names[0])
+    console.log('Listening on graphite using influx')
   }
 })
 .catch(function (err) {
@@ -31,14 +30,35 @@ influx.getDatabaseNames()
   return err.message
 })
 
-function query (file) {
+/* using another npm package */
+var Influxnode = require('influxdb-nodejs')
+var InfluxnodeClient = new Influxnode('http://172.22.89.2:8086/graphite')
+// check for db graphite
+// on influxdb and
+// show all the dbs listening on
+InfluxnodeClient.showDatabases()
+.then(function (names) {
+  console.log('c2 ' + names.join(', '))
+  if (!names.includes('graphite')) {
+    console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
+  } else {
+    console.log('Listening on graphite using influxdb-nodejs')
+  }
+})
+.catch(function (err) {
+  console.error('Error looking up graphite!')
+  return err.message
+})
+
+function miniQuery (file) {
   // consider using here: path.join(__dirname, file)
   return new pgp.QueryFile(file, {minify: true})
 }
 
+// export as x:function
 module.exports = {
   foddb: fodDb,
-  influx: influx,
-  graphite: client,
-  query: query
+  influxClient: influxClient,
+  InfluxnodeClient: InfluxnodeClient,
+  miniQuery: miniQuery
 }

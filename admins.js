@@ -3,7 +3,7 @@
 var db = require('./db')
 
 function verifyAccess (req, res, next) {
-  var sqlAdminAccess = db.query('../sql/adminAccess.sql')
+  var sqlAdminAccess = db.miniQuery('../sql/adminAccess.sql')
   db.foddb.one(sqlAdminAccess, {usr: req.params.usr, pwd: req.params.pass})
     .then(function (data) {
       res.status(200)
@@ -20,7 +20,7 @@ function verifyAccess (req, res, next) {
 }
 
 function getAllAdmins (req, res, next) {
-  var sqlAllAdmins = db.query('../sql/allAdmins.sql')
+  var sqlAllAdmins = db.miniQuery('../sql/allAdmins.sql')
   db.foddb.any(sqlAllAdmins)
     .then(function (data) {
       res.status(200)
@@ -38,7 +38,7 @@ function getAllAdmins (req, res, next) {
 }
 
 function getOneAdmin (req, res, next) {
-  var sqlOneAdmin = db.query('../sql/oneAdmin.sql')
+  var sqlOneAdmin = db.miniQuery('../sql/oneAdmin.sql')
   // console.log(sqlOneAdmin);
   db.foddb.one(sqlOneAdmin, {usr: req.params.usr})
     .then(function (data) {
@@ -57,7 +57,7 @@ function getOneAdmin (req, res, next) {
 }
 
 function createAdmin (req, res, next) {
-  var sqlInsertAdmin = db.query('../sql/insertAdmin.sql')
+  var sqlInsertAdmin = db.miniQuery('../sql/insertAdmin.sql')
   db.foddb.none(sqlInsertAdmin,
     { custid: parseInt(req.body.custid),
       usrtype: req.body.usrtype,
@@ -81,7 +81,7 @@ function createAdmin (req, res, next) {
 }
 
 function updateAdmin (req, res, next) {
-  var sqlUpdateAdmin = db.query('../sql/updateAdmin.sql')
+  var sqlUpdateAdmin = db.miniQuery('../sql/updateAdmin.sql')
   db.foddb.none(sqlUpdateAdmin,
     { custid: parseInt(req.body.custid),
       usrtype: req.body.type,
@@ -105,7 +105,7 @@ function updateAdmin (req, res, next) {
 }
 
 function removeAdmin (req, res, next) {
-  var sqlDeleteAdmin = db.query('../sql/deleteAdmin.sql')
+  var sqlDeleteAdmin = db.miniQuery('../sql/deleteAdmin.sql')
   db.foddb.result(sqlDeleteAdmin, {usr: req.params.usr})
     .then(function (result) {
       res.status(200)
