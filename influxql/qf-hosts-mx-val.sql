@@ -1,6 +1,10 @@
-select max(value::float) as y, time as x
+/**
+ * show max incoming values grouped by pps, bps or flows
+ */
+select max(value) as y, time as x
 from graphite.autogen.hosts
 where direction = 'incoming'
-and time > now() - 12h
-group by resource, time(1d)
+and time > now() - 1h
+and time < now() - 30m
+group by resource, time(20s)
 order by time desc

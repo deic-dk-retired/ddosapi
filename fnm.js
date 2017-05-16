@@ -9,11 +9,7 @@ function getSeries (req, res, next) {
   var qryfile = req.params.qryfile + '.sql'
   /**
    * store minified queryfile object into a variable
-   * QueryFile {
-      file: "filename.sql"
-      options: {"debug":false,"minify":true,"compress":false}
-      query: "select * from ..."
-    }
+   * QueryFile { file: "filename.sql", options: {"debug":false,"minify":true,"compress":false}, query: "select * .."}
    */
   var getAllSeries = db.miniQuery('../influxql/' + qryfile)
   db.influxClient.query(getAllSeries.query)
@@ -36,8 +32,8 @@ function getSeriesWithTime (req, res, next) {
   // var topn = parseInt(req.params.num)
   var getAllSeries = db.miniQuery('../influxql/' + qryfile)
   /**
-   * from nth day to n-x days going backwards e.g. 5days ago to 6days ago
-   * gives data for 6 days ago thus "tmfrm < tuntil"
+   * from nth day to n-x days going backwards e.g. 5days ago to 6days ago gives data for 6 days ago thus
+   * "tmfrm < tuntil"
    */
   db.influxnodeClient.queryRaw(getAllSeries.query)
     .then(function (data) {
@@ -55,53 +51,29 @@ function getSeriesWithTime (req, res, next) {
     })
 }
 
-/*
-uses npm influxdb-nodejs
-*/
-function getOneSeries (req, res, next) {
-  // var qryfile = req.params.qryfile + '.sql'
-  // var getAllSeries = db.miniQuery('../influxql/' + qryfile)
-  db.influxClient.query('select max(value::float) from graphite.autogen.hosts where direction = \'incoming\' and time > now() - 5d group by resource, time(5h) order by time desc')
-  .then(function (data) {
-    res.status(200)
-    .json({
-      status: 'success',
-      data: data,
-      size: data.length,
-      message: 'Retrieved requested series'
-    })
-  })
-  .catch(function (err) {
-    return next(err.message)
-  })
-}
-
-/*
-uses npm influx on static query file
-*/
-function getGrpSeries (req, res, next) {
-  var qryfile = 'qf-hosts-mx-val.sql'
-  var getAllSeries = db.miniQuery('../influxql/' + qryfile)
-  // console.log(getAllSeries.query);
-  db.influxClient.query(getAllSeries.query)
-  .then(function (data) {
-    // console.log(data);
-    res.status(200)
-    .json({
-      status: 'success',
-      data: data,
-      size: data.length,
-      message: 'Retrieved requested series'
-    })
-  })
-  .catch(function (err) {
-    return next(err.message)
-  })
-}
+/**
+ * use npm influxdb-nodejs to fetch results using queryRaw()
+ */
+// function getOneSeries (req, res, next) {
+//   // var qryfile = req.params.qryfile + '.sql'
+//   // var getAllSeries = db.miniQuery('../influxql/' + qryfile)
+//   db.influxnodeClient.queryRaw('select max(value::float) from graphite.autogen.hosts where direction = \'incoming\' and time > now() - 25d group by resource, time(5d) order by time desc')
+//   .then(function (data) {
+//     res.status(200)
+//     .json({
+//       status: 'success',
+//       data: data,
+//       size: data.length,
+//       message: 'Retrieved requested series'
+//     })
+//   })
+//   .catch(function (err) {
+//     return next(err.message)
+//   })
+// }
 
 module.exports = {
   getSeries: getSeries,
   getSeriesWithTime: getSeriesWithTime
-  // getOneSeries: getOneSeries,
-  // getGrpSeries: getGrpSeries
+  // getOneSeries: getOneSeries
 }
