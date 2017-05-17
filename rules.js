@@ -2,7 +2,7 @@
 // query handler method
 var db = require('./db')
 
-function getAllRules (req, res, next) {
+function getRules (req, res, next) {
   var sqlGetAllRules = db.miniQuery('../sql/getAllRules.sql')
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
@@ -19,26 +19,9 @@ function getAllRules (req, res, next) {
     })
 }
 
-function getRulesByIP (req, res, next) {
-  var sqlAllRulesByIP = db.miniQuery('../sql/allRulesByIP.sql')
-  db.foddb.any(sqlAllRulesByIP)
-    .then(function (data) {
-      res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved all rules grouped by IP'
-        })
-    })
-    .catch(function (err) {
-      return next(err.message)
-    })
-}
-
-function getRuleByID (req, res, next) {
+function getRuleById (req, res, next) {
   var ruleId = parseInt(req.params.id)
-  var sqlRuleByID = db.miniQuery('../sql/RuleByID.sql')
+  var sqlRuleByID = db.miniQuery('../sql/RuleById.sql')
   db.foddb.one(sqlRuleByID, {id: ruleId})
     .then(function (data) {
       res.status(200)
@@ -46,7 +29,7 @@ function getRuleByID (req, res, next) {
           status: 'success',
           data: data,
           size: data.length,
-          message: 'Retrieved one rule by ID'
+          message: 'Retrieved one rule using given rule Id'
         })
     })
     .catch(function (err) {
@@ -54,15 +37,16 @@ function getRuleByID (req, res, next) {
     })
 }
 
-// create a rule with form parameters
+/**
+ * create a rule with form parameters
+ */
 function createRule (req, res, next) {
-  // req.body.age = parseInt(req.body.age);
   db.foddb.none('', req.body)
     .then(function () {
       res.status(200)
         .json({
           status: 'success',
-          size: data.length,
+          // size: data.length,
           message: 'Inserted one rule'
         })
     })
@@ -72,8 +56,7 @@ function createRule (req, res, next) {
 }
 
 module.exports = {
-  getAllRules: getAllRules,
-  getRulesByIP: getRulesByIP,
-  getRuleByID: getRuleByID,
+  getRules: getRules,
+  getRuleById: getRuleById,
   createRule: createRule
 }

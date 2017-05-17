@@ -30,9 +30,8 @@ router.delete('/api/admins/:usr', admins.removeAdmin)
 map urls to functions
 for rules
 */
-router.get('/api/rules/all', rules.getAllRules)
-router.get('/api/rules', rules.getRulesByIP)
-router.get('/api/rules/:id', rules.getRuleByID)
+router.get('/api/rules', rules.getRules)
+router.get('/api/rules/:id', rules.getRuleById)
 router.post('/api/rules', rules.createRule)
 
 /*
