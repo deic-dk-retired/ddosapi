@@ -12,7 +12,7 @@ var fodDb = pgp(connectStringFod)
  */
 fodDb.connect()
 .then(function (obj) {
-  console.log('listening on ' + obj.client.database + 'using pg-promise')
+  console.log('listening on ' + obj.client.database + ' using pg-promise')
 })
 .catch(error => {
   console.log('Error:', error)

@@ -32,6 +32,7 @@ for rules
 */
 router.get('/api/rules', rules.getRules)
 router.get('/api/rules/:id', rules.getRuleById)
+router.get('/api/rules/detail/:prot/:dest/:action/:isexp/:isact/:vfrom/:vto', rules.getRuleDetail)
 router.post('/api/rules', rules.createRule)
 
 /*

@@ -37,6 +37,30 @@ function getRuleById (req, res, next) {
     })
 }
 
+function getRuleDetail (req, res, next) {
+  var sqlRuleDetail = db.miniQuery('../sql/RuleDetail.sql')
+  db.foddb.any(sqlRuleDetail,
+    { prot: req.params.prot,
+      dest: req.params.dest,
+      action: req.params.action,
+      isexp: req.params.isexp,
+      isact: req.params.isact,
+      vfrom: req.params.vfrom,
+      vto: req.params.vto})
+    .then(function (data) {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: data,
+          size: data.length,
+          message: 'Retrieved one rule using given parameters'
+        })
+    })
+    .catch(function (err) {
+      return next(err.message)
+    })
+}
+
 /**
  * create a rule with form parameters
  */
@@ -58,5 +82,6 @@ function createRule (req, res, next) {
 module.exports = {
   getRules: getRules,
   getRuleById: getRuleById,
+  getRuleDetail: getRuleDetail,
   createRule: createRule
 }
