@@ -2,16 +2,16 @@
 // query handler method
 var db = require('./db')
 
-function getTypesICMP (req, res, next) {
-  var sqlGetAllRules = db.query('../sql/allTypesICMP.sql')
-  db.foddb.any(sqlGetAllRules)
+function getTypesIcmp (req, res, next) {
+  var allTypesIcmp = db.miniQuery('../sql/allTypesIcmp.sql')
+  db.foddb.any(allTypesIcmp)
     .then(function (data) {
       res.status(200)
         .json({
           status: 'success',
           data: data,
           size: data.length,
-          message: 'Retrieved all ICMP Types'
+          message: 'Retrieved all icmp types'
         })
     })
     .catch(function (err) {
@@ -19,16 +19,16 @@ function getTypesICMP (req, res, next) {
     })
 }
 
-function geCodesICMP (req, res, next) {
-  var sqlAllRulesByIP = db.query('../sql/allTypesICMP.sql')
-  db.foddb.any(sqlAllRulesByIP)
+function getCodesIcmp (req, res, next) {
+  var allCodesIcmp = db.miniQuery('../sql/allCodesIcmp.sql')
+  db.foddb.any(allCodesIcmp)
     .then(function (data) {
       res.status(200)
         .json({
           status: 'success',
           data: data,
           size: data.length,
-          message: 'Retrieved all ICMP Codes for...'
+          message: 'Retrieved all icmp codes'
         })
     })
     .catch(function (err) {
@@ -37,6 +37,6 @@ function geCodesICMP (req, res, next) {
 }
 
 module.exports = {
-  getTypesICMP: getTypesICMP,
-  geCodesICMP: geCodesICMP
+  getTypesIcmp: getTypesIcmp,
+  getCodesIcmp: getCodesIcmp
 }
