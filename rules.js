@@ -7,12 +7,7 @@ function getRules (req, res, next) {
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
       res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved all rules'
-        })
+      .json({data: data})
     })
     .catch(function (err) {
       return next(err.message)
@@ -25,12 +20,12 @@ function getRuleById (req, res, next) {
   db.foddb.one(sqlRuleByID, {id: ruleId})
     .then(function (data) {
       res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved one rule using given rule Id'
-        })
+      .json({
+        status: 'success',
+        rule: data,
+        size: data.length,
+        message: 'Retrieved one rule using given rule Id'
+      })
     })
     .catch(function (err) {
       return next(err.message)
@@ -49,12 +44,12 @@ function getRuleDetail (req, res, next) {
       vto: req.params.vto})
     .then(function (data) {
       res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved one rule using given parameters'
-        })
+      .json({
+        status: 'success',
+        rules: data,
+        size: data.length,
+        message: 'Retrieved one rule using given parameters'
+      })
     })
     .catch(function (err) {
       return next(err.message)
@@ -67,12 +62,12 @@ function getRuleDetail (req, res, next) {
 function createRule (req, res, next) {
   db.foddb.none('', req.body)
     .then(function () {
-      res.status(200)
-        .json({
-          status: 'success',
-          // size: data.length,
-          message: 'Inserted one rule'
-        })
+      res.status(201)
+      .json({
+        status: 'success',
+        // size: data.length,
+        message: 'Inserted one rule'
+      })
     })
     .catch(function (err) {
       return next(err.message)

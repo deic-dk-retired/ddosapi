@@ -2,7 +2,7 @@ var express = require('express')
 var router = express.Router()
 
 var icmp = require('../icmp')
-var admins = require('../admins')
+var users = require('../users')
 var rules = require('../rules')
 var fnm = require('../fnm')
 
@@ -18,16 +18,16 @@ router.get('/api/icmpt/:type', icmp.getTypesIcmp)
 router.get('/api/icmpc', icmp.getCodesIcmp)
 router.get('/api/icmpc/:code', icmp.getCodesIcmp)
 
-/*
+/**
 map urls to functions
-for admins
+for users
 */
-router.get('/api/login/:usr/:pass', admins.verifyAccess)
-router.get('/api/admins', admins.getAllAdmins)
-router.get('/api/admins/:usr', admins.getOneAdmin)
-router.post('/api/admins', admins.createAdmin)
-router.put('/api/admins/:usr', admins.updateAdmin)
-router.delete('/api/admins/:usr', admins.removeAdmin)
+router.get('/api/login/:usr/:pass', users.verifyAccess)
+router.get('/api/users', users.getAllUsers)
+router.get('/api/users/:usr', users.getOneUser)
+router.post('/api/users', users.createUser)
+router.put('/api/users/:usr', users.updateUser)
+router.delete('/api/users/:usr', users.removeUser)
 
 /*
 map urls to functions
