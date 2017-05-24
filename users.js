@@ -8,12 +8,12 @@ function verifyAccess (req, res, next) {
     .then(function (data) {
       res.status(200)
       .json({
-        users: data,
-        meta: {
-          status: 'success',
-          totalRecords: data.length,
-          comment: 'Compared one user'
-        }
+        data: data
+        // meta: {
+        //   status: 'success',
+        //   totalRecords: data.length,
+        //   comment: 'Compared one user'
+        // }
       })
     })
     .catch(function (err) {

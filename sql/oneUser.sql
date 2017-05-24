@@ -1,6 +1,6 @@
 SELECT
-  trim('users') as type,
   administratorid "id",
+  trim('users') as type,
   f.customerid "custid",
   c.companyname "company",
   f.kind "accessType",

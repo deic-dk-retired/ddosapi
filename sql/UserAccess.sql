@@ -1,8 +1,10 @@
 SELECT
+  f.administratorid "id",
+  trim('users') as type,
   f.kind "accessType",
   f.name "fullName",
-  to_char(f.lastlogin,'FMMon FMDDth, YYYY @ HH24:MI:SS') "lastLoggedOn",
-  to_char(f.lastpasswordchange,'FMMon FMDDth, YYYY @ HH24:MI:SS') "pwdLastChangedOn",
+  f.lastlogin "lastLoggedOn",
+  f.lastpasswordchange "pwdLastChangedOn",
   f.username,
   c.companyname "company",
   (f.password = crypt(${pwd}, f.password)) "hasAccess"

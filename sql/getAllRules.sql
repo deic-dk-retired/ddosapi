@@ -1,6 +1,6 @@
 SELECT distinct
-trim('rules') "type",
 flowspecruleid "id",
+trim('rules') "type",
 f.customerid "custid",
 rule_name "rname",
 f.administratorid "adminid",
