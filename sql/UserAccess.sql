@@ -1,6 +1,6 @@
 SELECT
-  f.administratorid "id",
   trim('users') as type,
+  f.administratorid "id",
   f.kind "accessType",
   f.name "fullName",
   f.lastlogin "lastLoggedOn",

@@ -12,11 +12,9 @@ var fnm = require('../fnm')
 map urls to functions
 for icmp types and codes
 */
-router.get('/api/icmpt', icmp.getTypesIcmp)
-router.get('/api/icmpt/:type', icmp.getTypesIcmp)
+router.get('/api/icmptypes', icmp.getTypesIcmp)
 
-router.get('/api/icmpc', icmp.getCodesIcmp)
-router.get('/api/icmpc/:code', icmp.getCodesIcmp)
+router.get('/api/icmpcodes', icmp.getCodesIcmp)
 
 /**
 map urls to functions

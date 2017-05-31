@@ -8,7 +8,7 @@ function verifyAccess (req, res, next) {
     .then(function (data) {
       res.status(200)
       .json({
-        data: data
+        users: data
         // meta: {
         //   status: 'success',
         //   totalRecords: data.length,
@@ -26,7 +26,7 @@ function getAllUsers (req, res, next) {
   db.foddb.any(sqlAllUsers)
     .then(function (data) {
       res.status(200)
-      .json({data: data})
+      .json({users: data})
     })
     .catch(function (err) {
       console.error(err.stack)
@@ -36,18 +36,10 @@ function getAllUsers (req, res, next) {
 
 function getOneUser (req, res, next) {
   var sqlOneUser = db.miniQuery('../sql/oneUser.sql')
-  // console.log(sqlOneUser);
   db.foddb.one(sqlOneUser, {usr: req.params.usr})
     .then(function (data) {
       res.status(200)
-      .json({
-        users: data,
-        meta: {
-          status: 'success',
-          totalRecords: data.length,
-          comment: 'Retrieved ONE Users'
-        }
-      })
+      .json({users: data})
     })
     .catch(function (err) {
       console.error(err.stack)
