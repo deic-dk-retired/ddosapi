@@ -1,6 +1,5 @@
 SELECT distinct
 flowspecruleid "id",
-trim('rules') "type",
 f.customerid "custid",
 rule_name "rname",
 f.administratorid "adminid",
@@ -31,7 +30,7 @@ where f.flowspecruleid in
 )
 order by validfrom desc;
 -- SELECT DISTINCT
---   row_number() over (ORDER BY fromdate DESC nulls last) as rownum,
+--   row_number() over (ORDER BY fromdate DESC nulls last) as id,
 --   admname,
 --   rulename,
 --   CASE
@@ -48,7 +47,7 @@ order by validfrom desc;
 --   action,
 --   count(destport) portsaff,
 --   max(pktlength) maxpktlength,
---   sum(duration) totduration,
+--   sum(duration) duration,
 --   isactive,
 --   isexpired
 -- FROM(

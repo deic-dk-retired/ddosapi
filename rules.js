@@ -7,7 +7,12 @@ function getRules (req, res, next) {
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
       res.status(200)
-      .json({rules: data})
+      .json({
+        rules: data,
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)
@@ -21,10 +26,10 @@ function getRuleById (req, res, next) {
     .then(function (data) {
       res.status(200)
       .json({
-        status: 'success',
-        rule: data,
-        size: data.length,
-        message: 'Retrieved one rule using given rule Id'
+        rules: data,
+        meta: {
+          total: data.length
+        }
       })
     })
     .catch(function (err) {
@@ -44,7 +49,12 @@ function getRuleDetail (req, res, next) {
       vto: req.params.vto})
     .then(function (data) {
       res.status(200)
-      .json({rules: data})
+      .json({
+        rules: data,
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)

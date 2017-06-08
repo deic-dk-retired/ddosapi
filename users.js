@@ -9,11 +9,6 @@ function verifyAccess (req, res, next) {
       res.status(200)
       .json({
         users: data
-        // meta: {
-        //   status: 'success',
-        //   totalRecords: data.length,
-        //   comment: 'Compared one user'
-        // }
       })
     })
     .catch(function (err) {
@@ -26,7 +21,12 @@ function getAllUsers (req, res, next) {
   db.foddb.any(sqlAllUsers)
     .then(function (data) {
       res.status(200)
-      .json({users: data})
+      .json({
+        users: data,
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       console.error(err.stack)

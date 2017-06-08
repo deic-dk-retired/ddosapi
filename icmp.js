@@ -7,7 +7,12 @@ function getTypesIcmp (req, res, next) {
   db.foddb.any(allTypesIcmp)
     .then(function (data) {
       res.status(200)
-      .json({icmptypes: data})
+      .json({
+        icmptypes: data,
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)
@@ -19,7 +24,12 @@ function getCodesIcmp (req, res, next) {
   db.foddb.any(allCodesIcmp)
     .then(function (data) {
       res.status(200)
-      .json({icmpcodes: data})
+      .json({
+        icmpcodes: data,
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)
