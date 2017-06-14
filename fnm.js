@@ -16,10 +16,10 @@ function getSeries (req, res, next) {
     .then(function (data) {
       res.status(200)
       .json({
-        status: 'success',
-        data: data,
-        size: data.length,
-        message: 'Retrieved requested series from query file'
+        stamp: data,
+        meta: {
+          total: data.length
+        }
       })
     })
     .catch(function (err) {
@@ -40,10 +40,10 @@ function getSeriesWithTime (req, res, next) {
       console.log(data)
       res.status(200)
         .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved requested series from query file with time intervals'
+          stamp: data,
+          meta: {
+            total: data.length
+          }
         })
     })
     .catch(function (err) {
