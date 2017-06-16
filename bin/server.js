@@ -1,6 +1,7 @@
 var app = require('../app')
 var debug = require('debug')('node-postgres-promises:server')
 var http = require('http')
+// var io = require('socket.io')(http)
 
 /**
  * Get port from environment and store in Express.
@@ -11,7 +12,7 @@ app.set('port', port)
 /**
  * Create HTTP server.
  */
-var server = http.createServer(app)
+var server = http.Server(app)
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -52,9 +53,11 @@ function onError (error) {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges')
       process.exit(1)
+      break
     case 'EADDRINUSE':
       console.error(bind + ' is already in use')
       process.exit(1)
+      break
     default:
       throw error
   }
