@@ -3,7 +3,7 @@
 var db = require('./db')
 
 function verifyAccess (req, res, next) {
-  var sqlUserAccess = db.miniQuery('../sql/UserAccess.sql')
+  var sqlUserAccess = db.miniQuery('.sql/UserAccess.sql')
   db.foddb.one(sqlUserAccess, {usr: req.params.usr, pwd: req.params.pass})
     .then(function (data) {
       res.status(200)
@@ -17,7 +17,7 @@ function verifyAccess (req, res, next) {
 }
 
 function getAllUsers (req, res, next) {
-  var sqlAllUsers = db.miniQuery('../sql/allUsers.sql')
+  var sqlAllUsers = db.miniQuery('.sql/allUsers.sql')
   db.foddb.any(sqlAllUsers)
     .then(function (data) {
       res.status(200)
@@ -35,7 +35,7 @@ function getAllUsers (req, res, next) {
 }
 
 function getOneUser (req, res, next) {
-  var sqlOneUser = db.miniQuery('../sql/oneUser.sql')
+  var sqlOneUser = db.miniQuery('.sql/oneUser.sql')
   db.foddb.one(sqlOneUser, {usr: req.params.usr})
     .then(function (data) {
       res.status(200)
@@ -48,7 +48,7 @@ function getOneUser (req, res, next) {
 }
 
 function createUser (req, res, next) {
-  var sqlInsertUser = db.miniQuery('../sql/insertUser.sql')
+  var sqlInsertUser = db.miniQuery('.sql/insertUser.sql')
   db.foddb.none(sqlInsertUser,
     { custid: parseInt(req.body.custid),
       usrtype: req.body.usrtype,
@@ -60,8 +60,10 @@ function createUser (req, res, next) {
     .then(function () {
       res.status(200)
       .json({
-        status: 'success',
-        message: 'Inserted one User'
+        meta: {
+          status: 'success',
+          message: 'Inserted one User'
+        }
       })
     })
     .catch(function (err) {
@@ -71,7 +73,7 @@ function createUser (req, res, next) {
 }
 
 function updateUser (req, res, next) {
-  var sqlUpdateUser = db.miniQuery('../sql/updateUser.sql')
+  var sqlUpdateUser = db.miniQuery('.sql/updateUser.sql')
   db.foddb.none(sqlUpdateUser,
     { custid: parseInt(req.body.custid),
       usrtype: req.body.type,
@@ -83,8 +85,10 @@ function updateUser (req, res, next) {
     .then(function () {
       res.status(200)
       .json({
-        status: 'success',
-        message: 'Updated User'
+        meta: {
+          status: 'success',
+          message: 'User modified'
+        }
       })
     })
     .catch(function (err) {
@@ -94,13 +98,15 @@ function updateUser (req, res, next) {
 }
 
 function removeUser (req, res, next) {
-  var sqlDeleteUser = db.miniQuery('../sql/deleteUser.sql')
+  var sqlDeleteUser = db.miniQuery('.sql/deleteUser.sql')
   db.foddb.result(sqlDeleteUser, {usr: req.params.usr})
     .then(function (result) {
       res.status(200)
       .json({
-        status: 'success',
-        message: 'Removed ' + result.rowCount + ' User'
+        meta: {
+          status: 'success',
+          message: 'Removed ' + result.rowCount + ' User'
+        }
       })
     })
     .catch(function (err) {

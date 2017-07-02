@@ -1,4 +1,5 @@
 var promise = require('bluebird')
+const path = require('path')
 var options = {
   // Initialization Options
   promiseLib: promise
@@ -66,8 +67,9 @@ InfluxnodeClient.showDatabases()
 })
 
 function miniQuery (file) {
-  // consider using here: path.join(__dirname, file)
-  return new pgp.QueryFile(file, {minify: true})
+  const fullPath = path.join(__dirname, file)
+  // console.log(fullPath)
+  return pgp.QueryFile(fullPath, {minify: true, noWarnings: true})
 }
 
 // export as x:function

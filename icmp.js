@@ -3,7 +3,7 @@
 var db = require('./db')
 
 function getTypesIcmp (req, res, next) {
-  var allTypesIcmp = db.miniQuery('../sql/allTypesIcmp.sql')
+  var allTypesIcmp = db.miniQuery('.sql/allTypesIcmp.sql')
   db.foddb.any(allTypesIcmp)
     .then(function (data) {
       res.status(200)
@@ -20,7 +20,7 @@ function getTypesIcmp (req, res, next) {
 }
 
 function getCodesIcmp (req, res, next) {
-  var allCodesIcmp = db.miniQuery('../sql/allCodesIcmp.sql')
+  var allCodesIcmp = db.miniQuery('.sql/allCodesIcmp.sql')
   db.foddb.any(allCodesIcmp)
     .then(function (data) {
       res.status(200)

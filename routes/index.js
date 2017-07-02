@@ -12,9 +12,8 @@ var fnm = require('../fnm')
 map urls to functions
 for icmp types and codes
 */
-router.get('/api/icmptypes', icmp.getTypesIcmp)
-
-router.get('/api/icmpcodes', icmp.getCodesIcmp)
+router.get('/api/icmp', icmp.getIcmp)
+// router.get('/api/icmpcodes', icmp.getCodesIcmp)
 
 /**
 map urls to functions
@@ -41,7 +40,8 @@ map urls to functions
 for time series data
 */
 router.get('/api/series/:qryfile', fnm.getSeries)
-router.get('/api/series/raw/:qryfile', fnm.getSeriesWithTime)
+// router.get('/api/series/raw', fnm.getSeriesWithTime)
+// router.get('/api/series/raw/:qryfile/:top', fnm.getSeriesWithTime)
 // router.get('/api/series/hosts/one', fnm.getOneSeries)
 // router.get('/api/series/:series', fnm.getAllSeries);
 
