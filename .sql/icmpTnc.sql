@@ -13,4 +13,4 @@ code->>'code' as value
 from flow.icmp_codes
 ) as c
 on t.id = c.typeid
-order by t.id asc
+order by typeid, codeid

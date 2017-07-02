@@ -13,7 +13,6 @@ map urls to functions
 for icmp types and codes
 */
 router.get('/api/icmp', icmp.getIcmp)
-// router.get('/api/icmpcodes', icmp.getCodesIcmp)
 
 /**
 map urls to functions
