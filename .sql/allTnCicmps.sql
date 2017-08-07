@@ -1,6 +1,6 @@
 select distinct
-  cast(coalesce(icmp->>'type', '0') as integer) as "typeid",
-  icmp->>'name' "type",
+  cast(coalesce(icmp->>'type', '0') as integer) as "id",
+  icmp->>'name' as "type",
   c.codeid,
   c.value as "code"
 from flow.icmp_types as t
@@ -13,4 +13,5 @@ code->>'code' as value
 from flow.icmp_codes
 ) as c
 on t.id = c.typeid
-order by typeid, codeid
+where icmp->>'name' is not null
+order by id, codeid

@@ -2,13 +2,13 @@
 // query handler method
 var db = require('./db')
 
-function getIcmps (req, res, next) {
-  var allTypesIcmp = db.miniQuery('.sql/allTnCicmps.sql')
-  db.foddb.any(allTypesIcmp)
+function getTcps (req, res, next) {
+  var allTcp = db.miniQuery('.sql/allTcps.sql')
+  db.foddb.any(allTcp)
     .then(function (data) {
       res.status(200)
       .json({
-        icmps: data,
+        tcps: data,
         meta: {
           total: data.length
         }
@@ -20,5 +20,5 @@ function getIcmps (req, res, next) {
 }
 
 module.exports = {
-  getIcmps: getIcmps
+  getTcps: getTcps
 }

@@ -1,5 +1,6 @@
 /**
- * show incoming pps values greater than 1mb
+ * show incoming pps values
+ * greater than 10^6 packets/sec
  */
 select value as y, time as x, resource
 from graphite.autogen.hosts

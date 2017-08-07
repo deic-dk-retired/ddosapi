@@ -3,7 +3,10 @@
 var db = require('./db')
 
 function getRules (req, res, next) {
-  var sqlGetAllRules = db.miniQuery('.sql/getAllRules.sql')
+  var sqlGetAllRules = db.miniQuery('.sql/allRules.sql')
+  // var rows = parseInt(req.params.rows)
+  // var offset = parseInt(req.params.offset)
+  // db.foddb.any(sqlGetAllRules, {rows: rows, offset: offset})
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
       res.status(200)
@@ -11,6 +14,7 @@ function getRules (req, res, next) {
         rules: data,
         meta: {
           total: data.length
+          // next: '/api/rules/'
         }
       })
     })

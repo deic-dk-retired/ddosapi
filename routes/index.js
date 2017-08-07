@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 
+var tcp = require('../tcp')
 var icmp = require('../icmp')
 var users = require('../users')
 var rules = require('../rules')
@@ -12,7 +13,13 @@ var fnm = require('../fnm')
 map urls to functions
 for icmp types and codes
 */
-router.get('/api/icmp', icmp.getIcmp)
+router.get('/api/icmps', icmp.getIcmps)
+
+/*
+map urls to functions
+for tcp flags
+*/
+router.get('/api/tcps', tcp.getTcps)
 
 /**
 map urls to functions
@@ -29,6 +36,7 @@ router.delete('/api/users/:usr', users.removeUser)
 map urls to functions
 for rules
 */
+// router.get('/api/rules/:rows/:offset', rules.getRules)
 router.get('/api/rules', rules.getRules)
 router.get('/api/rules/:id', rules.getRuleById)
 router.get('/api/rules/detail/:prot/:dest/:action/:isexp/:isact/:vfrom/:vto', rules.getRuleDetail)

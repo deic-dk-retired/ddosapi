@@ -28,7 +28,10 @@ where f.flowspecruleid in
   FROM flow.flowspecrules AS x
   WHERE coalesce(srcordestport,'') = coalesce(destinationport,'')
 )
-order by validfrom desc;
+order by validfrom desc
+limit 20
+-- offset ${rows}
+-- limit ${rows};
 -- SELECT DISTINCT
 --   row_number() over (ORDER BY fromdate DESC nulls last) as id,
 --   admname,

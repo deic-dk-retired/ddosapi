@@ -6,5 +6,5 @@ from graphite.autogen.hosts
 where resource='bps'
 and time < now() - 0m
 and time > now() - 30m
-and direction='incoming'
+and direction='outgoing'
 order by time desc
