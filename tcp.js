@@ -2,21 +2,20 @@
 // query handler method
 var db = require('./db')
 
-function getIcmps (req, res, next) {
-  var allTypesIcmp = db.miniQuery('.sql/misc/allTnCicmps.sql')
-  db.foddb.any(allTypesIcmp)
+function getTcps (req, res, next) {
+  var allTcp = db.miniQuery('.sql/misc/allTcps.sql')
+  db.foddb.any(allTcp)
     .then(function (data) {
-      // json api
+      // show jsonapi
       res.status(200)
       .json({
         data: data.map(function (e) {
           return {
-            type: 'icmps',
+            type: 'tcps',
             id: e.id,
             attributes: {
-              name: e.name,
-              codeid: e.codeid,
-              code: e.code
+              flag: e.flag,
+              desc: e.desc
             }
           }
         }),
@@ -31,5 +30,5 @@ function getIcmps (req, res, next) {
 }
 
 module.exports = {
-  getIcmps: getIcmps
+  getTcps: getTcps
 }

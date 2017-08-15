@@ -1,4 +1,23 @@
+const chalk = require('chalk')
 var promise = require('bluebird')
+const path = require('path')
+/*
+knexjs.org
+ */
+var knex = require('knex')({
+  client: 'pg',
+  version: '9.5',
+  connection: {
+    host: '127.0.0.1',
+    user: 'flowuser',
+    password: 'Gbr(Ff)wCJOF@localhost',
+    database: 'netflow'
+  },
+  debug: true
+})
+/*
+pg-promise stuff
+ */
 var options = {
   // Initialization Options
   promiseLib: promise
@@ -12,10 +31,10 @@ var fodDb = pgp(connectStringFod)
  */
 fodDb.connect()
 .then(function (obj) {
-  console.log('listening on ' + obj.client.database + 'using pg-promise')
+  console.log(chalk.hex('#EC407A')('listening on ' + obj.client.database + ' using pg-promise'))
 })
 .catch(error => {
-  console.log('Error:', error)
+  console.log(chalk.red('Error:', error))
 })
 /**
  * using official npm package
@@ -31,11 +50,11 @@ var influxClient = new Influx.InfluxDB({
  */
 influxClient.getDatabaseNames()
 .then(function (names) {
-  console.log('stream1: ' + names.join(', '))
+  console.log(chalk.hex('#26A69A')('stream1: ' + names.join(', ')))
   if (!names.includes('graphite')) {
-    console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
+    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/'))
   } else {
-    console.log('Listening on graphite using influx')
+    console.log(chalk.hex('#039BE5')('Listening on graphite using influx'))
   }
 })
 .catch(function (err) {
@@ -53,11 +72,11 @@ var InfluxnodeClient = new Influxnode('http://172.22.89.2:8086/graphite')
  */
 InfluxnodeClient.showDatabases()
 .then(function (names) {
-  console.log('stream2: ' + names.join(', '))
+  console.log(chalk.hex('#00897B')('stream2: ' + names.join(', ')))
   if (!names.includes('graphite')) {
-    console.log('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/')
+    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/'))
   } else {
-    console.log('Listening on graphite using influxdb-nodejs')
+    console.log(chalk.hex('#0277BD')('Listening on graphite using influxdb-nodejs'))
   }
 })
 .catch(function (err) {
@@ -66,14 +85,16 @@ InfluxnodeClient.showDatabases()
 })
 
 function miniQuery (file) {
-  // consider using here: path.join(__dirname, file)
-  return new pgp.QueryFile(file, {minify: true})
+  const fullPath = path.join(__dirname, file)
+  return pgp.QueryFile(fullPath, {minify: true, noWarnings: true})
 }
 
 // export as x:function
 module.exports = {
+  secret: 'ash80gossamer30',
+  knex: knex,
   foddb: fodDb,
   influxClient: influxClient,
-  InfluxnodeClient: InfluxnodeClient,
+  // InfluxnodeClient: InfluxnodeClient,
   miniQuery: miniQuery
 }

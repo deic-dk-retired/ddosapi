@@ -2,69 +2,87 @@
 // query handler method
 var db = require('./db')
 
-function getAllRules (req, res, next) {
-  var sqlGetAllRules = db.miniQuery('../sql/getAllRules.sql')
+function getRules (req, res, next) {
+  var sqlGetAllRules = db.miniQuery('.sql/rules/allRules.sql')
+  // var rows = parseInt(req.params.rows)
+  // var offset = parseInt(req.params.offset)
+  // db.foddb.any(sqlGetAllRules, {rows: rows, offset: offset})
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
+      // json api
       res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved all rules'
-        })
+      .json({
+        data: data.map(function (e) {
+          return {
+            type: 'rules',
+            id: parseInt(e.id),
+            attributes: e
+          }
+        }),
+        meta: {
+          total: data.length
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)
     })
 }
 
-function getRulesByIP (req, res, next) {
-  var sqlAllRulesByIP = db.miniQuery('../sql/allRulesByIP.sql')
-  db.foddb.any(sqlAllRulesByIP)
-    .then(function (data) {
-      res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved all rules grouped by IP'
-        })
-    })
-    .catch(function (err) {
-      return next(err.message)
-    })
-}
-
-function getRuleByID (req, res, next) {
+function getRuleById (req, res, next) {
   var ruleId = parseInt(req.params.id)
-  var sqlRuleByID = db.miniQuery('../sql/RuleByID.sql')
+  var sqlRuleByID = db.miniQuery('.sql/rules/RuleById.sql')
   db.foddb.one(sqlRuleByID, {id: ruleId})
     .then(function (data) {
       res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          size: data.length,
-          message: 'Retrieved one rule by ID'
-        })
+      .json({
+        data: {
+          type: 'rules',
+          id: parseInt(data.id),
+          attributes: data
+        }
+      })
     })
     .catch(function (err) {
       return next(err.message)
     })
 }
 
-// create a rule with form parameters
+function getRuleDetail (req, res, next) {
+  var sqlRuleDetail = db.miniQuery('.sql/rules/RuleDetail.sql')
+  db.foddb.any(sqlRuleDetail,
+    { prot: req.params.prot,
+      dest: req.params.dest,
+      action: req.params.action,
+      isexp: req.params.isexp,
+      isact: req.params.isact,
+      vfrom: req.params.vfrom,
+      vto: req.params.vto})
+    .then(function (data) {
+      res.status(200)
+      .json({
+        rules: data,
+        meta: {
+          total: data.length
+        }
+      })
+    })
+    .catch(function (err) {
+      return next(err.message)
+    })
+}
+
+/**
+ * create a rule with form parameters
+ */
 function createRule (req, res, next) {
-  // req.body.age = parseInt(req.body.age);
   db.foddb.none('', req.body)
     .then(function () {
-      res.status(200)
-        .json({
-          status: 'success',
-          size: data.length,
-          message: 'Inserted one rule'
-        })
+      res.status(201)
+      .json({
+        status: 'success',
+        message: 'Inserted one rule'
+      })
     })
     .catch(function (err) {
       return next(err.message)
@@ -72,8 +90,8 @@ function createRule (req, res, next) {
 }
 
 module.exports = {
-  getAllRules: getAllRules,
-  getRulesByIP: getRulesByIP,
-  getRuleByID: getRuleByID,
+  getRules: getRules,
+  getRuleById: getRuleById,
+  getRuleDetail: getRuleDetail,
   createRule: createRule
 }
