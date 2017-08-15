@@ -10,14 +10,14 @@ INSERT INTO flow.administrators
   lastpasswordchange
 )
 VALUES
-( ${custid},
-  ${usrtype},
-  ${usrname},
-  ${usrphone},
-  ${usr},
-  crypt(${pwd}, gen_salt('bf', 10)),
+( $(custid),
+  $(usertype),
+  $(fullname),
+  $(userphone),
+  $(username),
+  crypt($(password), gen_salt('bf', 10)),
   true,
-  null,
+  now(),
   now()
 );
 

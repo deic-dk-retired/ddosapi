@@ -3,12 +3,23 @@
 var db = require('./db')
 
 function getIcmps (req, res, next) {
-  var allTypesIcmp = db.miniQuery('.sql/allTnCicmps.sql')
+  var allTypesIcmp = db.miniQuery('.sql/misc/allTnCicmps.sql')
   db.foddb.any(allTypesIcmp)
     .then(function (data) {
+      // json api
       res.status(200)
       .json({
-        icmps: data,
+        data: data.map(function (e) {
+          return {
+            type: 'icmps',
+            id: e.id,
+            attributes: {
+              name: e.name,
+              codeid: e.codeid,
+              code: e.code
+            }
+          }
+        }),
         meta: {
           total: data.length
         }

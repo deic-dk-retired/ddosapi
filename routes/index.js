@@ -1,59 +1,68 @@
 var express = require('express')
-var router = express.Router()
+var openRouter = express.Router()
 
 var tcp = require('../tcp')
 var icmp = require('../icmp')
 var users = require('../users')
+var customers = require('../customers')
 var rules = require('../rules')
 var fnm = require('../fnm')
 
-// router.get('/')
+// openRouter.get('/')
 
 /*
 map urls to functions
 for icmp types and codes
 */
-router.get('/api/icmps', icmp.getIcmps)
+openRouter.get('/api/icmps', icmp.getIcmps)
 
 /*
 map urls to functions
 for tcp flags
 */
-router.get('/api/tcps', tcp.getTcps)
+openRouter.get('/api/tcps', tcp.getTcps)
 
 /**
 map urls to functions
 for users
 */
-router.get('/api/login/:usr/:pass', users.verifyAccess)
-router.get('/api/users', users.getAllUsers)
-router.get('/api/users/:usr', users.getOneUser)
-router.post('/api/users', users.createUser)
-router.put('/api/users/:usr', users.updateUser)
-router.delete('/api/users/:usr', users.removeUser)
+openRouter.post('/api/authenticate', users.authenticate)
+openRouter.post('/api/login', users.verifyAccess)
+openRouter.get('/api/users', users.getAllUsers)
+openRouter.get('/api/users/:username', users.getOneUser)
+openRouter.post('/api/users', users.createUser)
+openRouter.patch('/api/users/:username', users.updateUser)
+openRouter.delete('/api/users/:username', users.removeUser)
+
+/**
+map urls to functions
+for customers
+*/
+openRouter.get('/api/customers', customers.getAllCustomers)
+openRouter.get('/api/customers/:customerid', customers.getOneCustomer)
 
 /*
 map urls to functions
 for rules
 */
-// router.get('/api/rules/:rows/:offset', rules.getRules)
-router.get('/api/rules', rules.getRules)
-router.get('/api/rules/:id', rules.getRuleById)
-router.get('/api/rules/detail/:prot/:dest/:action/:isexp/:isact/:vfrom/:vto', rules.getRuleDetail)
-router.post('/api/rules', rules.createRule)
+// openRouter.get('/api/rules/:rows/:offset', rules.getRules)
+openRouter.get('/api/rules', rules.getRules)
+openRouter.get('/api/rules/:id', rules.getRuleById)
+openRouter.get('/api/rules/detail/:prot/:dest/:action/:isexp/:isact/:vfrom/:vto', rules.getRuleDetail)
+openRouter.post('/api/rules', rules.createRule)
 
 /*
 map urls to functions
 for time series data
 */
-router.get('/api/series/:qryfile', fnm.getSeries)
-// router.get('/api/series/raw', fnm.getSeriesWithTime)
-// router.get('/api/series/raw/:qryfile/:top', fnm.getSeriesWithTime)
-// router.get('/api/series/hosts/one', fnm.getOneSeries)
-// router.get('/api/series/:series', fnm.getAllSeries);
+openRouter.get('/api/series/:qryfile', fnm.getSeries)
+// openRouter.get('/api/series/raw', fnm.getSeriesWithTime)
+// openRouter.get('/api/series/raw/:qryfile/:top', fnm.getSeriesWithTime)
+// openRouter.get('/api/series/hosts/one', fnm.getOneSeries)
+// openRouter.get('/api/series/:series', fnm.getAllSeries);
 
 /*
-export express new router object
+export express new openRouter object
 and its methods
 */
-module.exports = router
+module.exports = openRouter

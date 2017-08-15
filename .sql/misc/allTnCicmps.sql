@@ -1,6 +1,6 @@
 select distinct
   cast(coalesce(icmp->>'type', '0') as integer) as "id",
-  icmp->>'name' as "type",
+  icmp->>'name' as "name",
   c.codeid,
   c.value as "code"
 from flow.icmp_types as t
