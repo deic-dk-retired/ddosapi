@@ -7,8 +7,8 @@ SELECT
   f.lastpasswordchange "pwdLastChangedOn",
   f.username,
   c.companyname "company",
-  (f.password = crypt(${pwd}, f.password)) "hasAccess"
+  (f.password = crypt($(password), f.password)) "hasAccess"
 FROM flow.administrators f
 LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
-WHERE f.username = ${usr}
+WHERE f.username = $(username)

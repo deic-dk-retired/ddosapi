@@ -1,5 +1,5 @@
 DELETE
 FROM flow.administrators
-WHERE username = ${usr};
+WHERE username = $(username);
 
 COMMIT;

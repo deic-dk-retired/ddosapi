@@ -3,18 +3,24 @@
 var db = require('./db')
 
 function getRules (req, res, next) {
-  var sqlGetAllRules = db.miniQuery('.sql/allRules.sql')
+  var sqlGetAllRules = db.miniQuery('.sql/rules/allRules.sql')
   // var rows = parseInt(req.params.rows)
   // var offset = parseInt(req.params.offset)
   // db.foddb.any(sqlGetAllRules, {rows: rows, offset: offset})
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
+      // json api
       res.status(200)
       .json({
-        rules: data,
+        data: data.map(function (e) {
+          return {
+            type: 'rules',
+            id: parseInt(e.id),
+            attributes: e
+          }
+        }),
         meta: {
           total: data.length
-          // next: '/api/rules/'
         }
       })
     })
@@ -25,14 +31,15 @@ function getRules (req, res, next) {
 
 function getRuleById (req, res, next) {
   var ruleId = parseInt(req.params.id)
-  var sqlRuleByID = db.miniQuery('.sql/RuleById.sql')
+  var sqlRuleByID = db.miniQuery('.sql/rules/RuleById.sql')
   db.foddb.one(sqlRuleByID, {id: ruleId})
     .then(function (data) {
       res.status(200)
       .json({
-        rules: data,
-        meta: {
-          total: data.length
+        data: {
+          type: 'rules',
+          id: parseInt(data.id),
+          attributes: data
         }
       })
     })
@@ -42,7 +49,7 @@ function getRuleById (req, res, next) {
 }
 
 function getRuleDetail (req, res, next) {
-  var sqlRuleDetail = db.miniQuery('.sql/RuleDetail.sql')
+  var sqlRuleDetail = db.miniQuery('.sql/rules/RuleDetail.sql')
   db.foddb.any(sqlRuleDetail,
     { prot: req.params.prot,
       dest: req.params.dest,
