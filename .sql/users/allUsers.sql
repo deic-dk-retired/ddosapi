@@ -1,15 +1,17 @@
  SELECT distinct
-  administratorid "id",
-  f.customerid "custid",
-  c.companyname "customer",
-  f.kind "accesstype",
+  administratorid,
+  f.customerid,
+  c.companyname,
+  f.kind,
   f.name,
+  f.phone,
   f.username,
+  f.password,
   coalesce(f.email, f.username || '@deic.dk') "email",
-  coalesce(f.lastlogin, now()) "lastloggedin",
-  coalesce(f.lastpasswordchange, now()) "pwdlastchangedon"
+  coalesce(f.lastlogin, now()) "lastlogin",
+  coalesce(f.lastpasswordchange, now()) "lastpasswordchange"
 FROM flow.administrators as f
-RIGHT OUTER JOIN flow.customers as c
+LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
 WHERE f.valid = 'TRUE'
-ORDER BY lastloggedin DESC
+ORDER BY lastlogin DESC

@@ -3,6 +3,7 @@ INSERT INTO flow.administrators
   kind,
   name,
   phone,
+  email,
   username,
   password,
   valid,
@@ -10,10 +11,11 @@ INSERT INTO flow.administrators
   lastpasswordchange
 )
 VALUES
-( $(custid),
-  $(usertype),
-  $(fullname),
-  $(userphone),
+( $(customerid),
+  $(kind),
+  $(name),
+  $(phone),
+  $(email),
   $(username),
   crypt($(password), gen_salt('bf', 10)),
   true,

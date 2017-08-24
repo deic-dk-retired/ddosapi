@@ -10,6 +10,12 @@ var passport = require('passport')
 var jwt = require('jwt-simple')
 // var LocalStrategy = require('passport-local')
 var index = require('./routes/index')
+var tcps = require('./routes/tcps')
+var icmps = require('./routes/icmps')
+var users = require('./routes/users')
+var rules = require('./routes/rules')
+var customers = require('./routes/customers')
+var fnm = require('./routes/fnm')
 
 var app = express()
 
@@ -37,6 +43,12 @@ app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', index)
+app.use('/api', tcps)
+app.use('/api', icmps)
+app.use('/api', users)
+app.use('/api', rules)
+app.use('/api', customers)
+app.use('/api', fnm)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

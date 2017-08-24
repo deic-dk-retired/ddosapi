@@ -37,9 +37,11 @@ function getOneCustomer (req, res, next) {
       // show jsonapi
       res.status(200)
       .json({
-        type: 'customers',
-        id: parseInt(data.customerid),
-        attributes: data
+        data: {
+          type: 'customers',
+          id: parseInt(data.customerid),
+          attributes: data
+        }
       })
     })
     .catch(function (err) {

@@ -6,15 +6,15 @@ const chalk = require('chalk')
 
 // uses json api conventions
 function authenticate (req, res, next) {
-  var sqlUserAccess = db.miniQuery('.sql/users/UserAccess.sql')
+  var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   // console.log(chalk.hex('#039BE5')(sqlUserAccess))
-  db.foddb.any(sqlUserAccess, {usr: req.params.username, pwd: req.params.password})
+  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then(function (data) {
       console.log(chalk.hex('#039BE5')(data))
       res.status(200)
       .json({
         type: 'users',
-        id: data.id,
+        id: parseInt(data.id),
         attributes: data
       })
     })
@@ -23,13 +23,15 @@ function authenticate (req, res, next) {
     })
 }
 
-function verifyAccess (req, res, next) {
-  var sqlUserAccess = db.miniQuery('.sql/users/UserAccess.sql')
-  db.foddb.any(sqlUserAccess, {usr: req.params.username, pwd: req.params.password})
+function auth (req, res, next) {
+  var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
+  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then(function (data) {
       res.status(200)
       .json({
-        users: data
+        type: 'users',
+        id: data.id,
+        attributes: data
       })
     })
     .catch(function (err) {
@@ -47,7 +49,7 @@ function getAllUsers (req, res, next) {
       data.map(function (e) {
         jsonarr.push({
           type: 'users',
-          id: parseInt(e.id),
+          id: parseInt(e.administratorid),
           attributes: e
         })
       })
@@ -66,42 +68,15 @@ function getAllUsers (req, res, next) {
 // uses json api conventions
 function getOneUser (req, res, next) {
   var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
-  db.foddb.one(sqlOneUser, {username: req.params.username})
+  db.foddb.one(sqlOneUser, {userid: req.params.userid})
     .then(function (data) {
       // show jsonapi
       res.status(200)
       .json({
-        type: 'users',
-        id: parseInt(data.id),
-        attributes: data
-      })
-    })
-    .catch(function (err) {
-      console.error(err.stack)
-      return next(err.message)
-    })
-}
-
-function createUser (req, res, next) {
-  var sqlInsertUser = db.miniQuery('.sql/users/createUser.sql')
-  db.foddb.none(sqlInsertUser,
-    { custid: parseInt(req.body.custid),
-      usertype: req.body.usertype,
-      fullname: req.body.fullname,
-      userphone: req.body.userphone,
-      username: req.body.username,
-      password: req.body.password
-    })
-    .then(function () {
-      res.status(200)
-      .json({
-        meta: {
-          status: 'successfully created user',
-          message: {
-            user: req.body.fullname,
-            username: req.body.username,
-            type: req.body.usertype
-          }
+        data: {
+          type: 'users',
+          id: parseInt(data.administratorid),
+          attributes: data
         }
       })
     })
@@ -120,14 +95,46 @@ function updateUser (req, res, next) {
       name: req.body.name,
       phone: req.body.phone,
       email: req.body.email,
-      username: req.params.username
+      username: req.body.username,
+      password: req.body.password,
+      userid: parseInt(req.params.userid)
     })
     .then(function () {
       res.status(200)
       .json({
         meta: {
           status: 'success',
-          message: 'User ' + req.params.username + ' modified'
+          message: 'User ' + req.body.username + ' modified'
+        }
+      })
+    })
+    .catch(function (err) {
+      console.error(err.stack)
+      return next(err.message)
+    })
+}
+
+function createUser (req, res, next) {
+  var sqlInsertUser = db.miniQuery('.sql/users/createUser.sql')
+  db.foddb.none(sqlInsertUser,
+    { customerid: parseInt(req.body.customerid),
+      kind: req.body.kind,
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+      username: req.body.username,
+      password: req.body.password
+    })
+    .then(function () {
+      res.status(200)
+      .json({
+        meta: {
+          status: 'successfully created user',
+          message: {
+            user: req.body.name,
+            username: req.body.username,
+            access: req.body.kind
+          }
         }
       })
     })
@@ -157,7 +164,7 @@ function removeUser (req, res, next) {
 
 module.exports = {
   authenticate: authenticate,
-  verifyAccess: verifyAccess,
+  auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
   createUser: createUser,
