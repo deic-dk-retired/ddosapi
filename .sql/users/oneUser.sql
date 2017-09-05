@@ -1,15 +1,17 @@
 SELECT
-  administratorid "id",
-  f.customerid "custid",
-  c.companyname "company",
-  f.kind "accesstype",
+  administratorid,
+  f.customerid,
+  c.companyname,
+  f.kind,
   f.name,
   f.phone,
   f.username,
+  f.password,
   coalesce(f.email, f.username || '@deic.dk') "email",
-  coalesce(f.lastlogin, now()) "lastloggedin",
-  coalesce(f.lastpasswordchange, now()) "pwdlastchangedon"
+  coalesce(f.lastlogin, now()) "lastlogin",
+  coalesce(f.lastpasswordchange, now()) "lastpasswordchange"
 FROM flow.administrators f
 LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
-WHERE f.username = $(username)
+WHERE f.administratorid = $(userid)
+AND f.valid = 'active'

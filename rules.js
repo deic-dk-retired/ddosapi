@@ -10,15 +10,22 @@ function getRules (req, res, next) {
   db.foddb.any(sqlGetAllRules)
     .then(function (data) {
       // json api
+      var jsonarr = []
+      var jsonobj
+      data.map(function (e) {
+        jsonobj = {
+          type: 'rules',
+          id: parseInt(e.id)
+        }
+        // remove duplicate id property from attributes
+        delete e.id
+        jsonobj.attributes = e
+        jsonarr.push(jsonobj)
+      })
+
       res.status(200)
       .json({
-        data: data.map(function (e) {
-          return {
-            type: 'rules',
-            id: parseInt(e.id),
-            attributes: e
-          }
-        }),
+        data: jsonarr,
         meta: {
           total: data.length
         }

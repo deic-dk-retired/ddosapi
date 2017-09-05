@@ -6,15 +6,15 @@ const chalk = require('chalk')
 
 // uses json api conventions
 function authenticate (req, res, next) {
-  var sqlUserAccess = db.miniQuery('.sql/users/UserAccess.sql')
+  var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   // console.log(chalk.hex('#039BE5')(sqlUserAccess))
-  db.foddb.any(sqlUserAccess, {usr: req.params.username, pwd: req.params.password})
+  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then(function (data) {
       console.log(chalk.hex('#039BE5')(data))
       res.status(200)
       .json({
         type: 'users',
-        id: data.id,
+        id: parseInt(data.id),
         attributes: data
       })
     })
@@ -23,13 +23,15 @@ function authenticate (req, res, next) {
     })
 }
 
-function verifyAccess (req, res, next) {
-  var sqlUserAccess = db.miniQuery('.sql/users/UserAccess.sql')
-  db.foddb.any(sqlUserAccess, {usr: req.params.username, pwd: req.params.password})
+function auth (req, res, next) {
+  var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
+  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then(function (data) {
       res.status(200)
       .json({
-        users: data
+        type: 'users',
+        id: data.id,
+        attributes: data
       })
     })
     .catch(function (err) {
@@ -44,17 +46,38 @@ function getAllUsers (req, res, next) {
     .then(function (data) {
       // create json api array
       var jsonarr = []
+      var jsonobj
       data.map(function (e) {
-        jsonarr.push({
+        jsonobj = {
           type: 'users',
-          id: parseInt(e.id),
-          attributes: e
-        })
+          id: parseInt(e.administratorid),
+          links: {
+            self: 'http://10.33.1.97:4242/api/users/' + e.administratorid
+          },
+          relationships: {
+            networks: {
+              links: {
+                self: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/relationships/networks',
+                related: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/networks'
+              },
+              data: ''
+            }
+          }
+        }
+        // remove duplicate id property from attributes
+        delete e.administratorid
+        jsonobj.attributes = e
+
+        jsonarr.push(jsonobj)
       })
+
       // show jsonapi
       res.status(200)
       .json({
-        data: jsonarr
+        data: jsonarr,
+        meta: {
+          total: data.length
+        }
       })
     })
     .catch(function (err) {
@@ -66,14 +89,74 @@ function getAllUsers (req, res, next) {
 // uses json api conventions
 function getOneUser (req, res, next) {
   var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
-  db.foddb.one(sqlOneUser, {username: req.params.username})
+  db.foddb.one(sqlOneUser, {userid: req.params.userid})
     .then(function (data) {
+      var getAllCustomerNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+      var jsonobj = {
+        type: 'users',
+        id: parseInt(data.administratorid),
+        links: {
+          self: 'http://10.33.1.97:4242/api/users/' + data.administratorid
+        },
+        relationships: {
+          networks: {
+            links: {
+              self: 'http://10.33.1.97:4242/api/users/' + data.administratorid + '/relationships/networks',
+              related: 'http://10.33.1.97:4242/api/users/' + data.administratorid + '/networks'
+            },
+            data: ''
+          }
+        }
+      }
+
+      // promise relations
+      var rearr
+      db.foddb.any(getAllCustomerNetworks, {userid: data.administratorid})
+        .then(function (d) {
+          console.log(d.length)
+          // create obj or array of objects
+          // based on data length
+          if (d.length > 1) {
+            console.log('array of objects: ' + d.length)
+            var reobj
+            rearr = []
+            d.map(function (f) {
+              reobj = {
+                type: 'networks',
+                id: parseInt(f.customernetworkid)
+              }
+              return rearr.push(reobj)
+            })
+          }
+          if (d.length === 1) {
+            console.log('one object: ' + d.length)
+            rearr = {
+              type: 'networks',
+              id: parseInt(d.customernetworkid)
+            }
+          }
+          if (d.length === 0) {
+            console.log('empty array: ' + d.length)
+            rearr = []
+          }
+          return rearr
+        })
+        .then(function () {
+          console.log(rearr)
+          return (jsonobj.relationships.networks.data = rearr)
+        })
+        .catch(function (err) {
+          console.error(err.stack)
+          return next(err.message)
+        })
+      console.log(jsonobj.relationships.networks)
+      // remove duplicate id property from attributes
+      delete data.administratorid
+      jsonobj.attributes = data
       // show jsonapi
       res.status(200)
       .json({
-        type: 'users',
-        id: parseInt(data.id),
-        attributes: data
+        data: jsonobj
       })
     })
     .catch(function (err) {
@@ -82,27 +165,30 @@ function getOneUser (req, res, next) {
     })
 }
 
-function createUser (req, res, next) {
-  var sqlInsertUser = db.miniQuery('.sql/users/createUser.sql')
-  db.foddb.none(sqlInsertUser,
-    { custid: parseInt(req.body.custid),
-      usertype: req.body.usertype,
-      fullname: req.body.fullname,
-      userphone: req.body.userphone,
-      username: req.body.username,
-      password: req.body.password
-    })
-    .then(function () {
+function getUserNetworks (req, res, next) {
+  var getAllCustomerNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  db.foddb.any(getAllCustomerNetworks, {userid: req.params.userid})
+    .then(function (data) {
+      // create json api array
+      var jsonarr = []
+      var jsonobj
+      data.map(function (e) {
+        jsonobj = {
+          type: 'networks',
+          id: parseInt(e.customernetworkid)
+        }
+        // remove duplicate id property from attributes
+        delete e.customernetworkid
+        jsonobj.attributes = e
+        jsonarr.push(jsonobj)
+      })
+      // show jsonapi
       res.status(200)
       .json({
-        meta: {
-          status: 'successfully created user',
-          message: {
-            user: req.body.fullname,
-            username: req.body.username,
-            type: req.body.usertype
-          }
-        }
+        links: {
+          self: 'http://10.33.1.97:4242/api/networks/' + jsonarr[0].id
+        },
+        data: jsonarr
       })
     })
     .catch(function (err) {
@@ -120,14 +206,46 @@ function updateUser (req, res, next) {
       name: req.body.name,
       phone: req.body.phone,
       email: req.body.email,
-      username: req.params.username
+      username: req.body.username,
+      password: req.body.password,
+      userid: parseInt(req.params.userid)
     })
     .then(function () {
       res.status(200)
       .json({
         meta: {
           status: 'success',
-          message: 'User ' + req.params.username + ' modified'
+          message: 'User ' + req.body.username + ' modified'
+        }
+      })
+    })
+    .catch(function (err) {
+      console.error(err.stack)
+      return next(err.message)
+    })
+}
+
+function createUser (req, res, next) {
+  var sqlInsertUser = db.miniQuery('.sql/users/createUser.sql')
+  db.foddb.none(sqlInsertUser,
+    { customerid: parseInt(req.body.customerid),
+      kind: req.body.kind,
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+      username: req.body.username,
+      password: req.body.password
+    })
+    .then(function () {
+      res.status(200)
+      .json({
+        meta: {
+          status: 'successfully created user',
+          message: {
+            user: req.body.name,
+            username: req.body.username,
+            access: req.body.kind
+          }
         }
       })
     })
@@ -157,9 +275,10 @@ function removeUser (req, res, next) {
 
 module.exports = {
   authenticate: authenticate,
-  verifyAccess: verifyAccess,
+  auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
+  getUserNetworks: getUserNetworks,
   createUser: createUser,
   updateUser: updateUser,
   removeUser: removeUser

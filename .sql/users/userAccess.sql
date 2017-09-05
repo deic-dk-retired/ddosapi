@@ -1,12 +1,12 @@
 SELECT
   trim('users') as type,
-  f.administratorid "id",
-  f.kind "accessType",
-  f.name "fullName",
-  f.lastlogin "lastLoggedOn",
-  f.lastpasswordchange "pwdLastChangedOn",
+  f.administratorid,
+  f.kind,
+  f.name,
+  f.lastlogin,
+  f.lastpasswordchange,
   f.username,
-  c.companyname "company",
+  c.companyname,
   (f.password = crypt($(password), f.password)) "hasAccess"
 FROM flow.administrators f
 LEFT JOIN flow.customers c

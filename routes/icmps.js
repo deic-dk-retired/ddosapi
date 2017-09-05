@@ -1,7 +1,15 @@
 var express = require('express')
 var openRouter = express.Router()
 
-openRouter.get('/')
+var icmp = require('../icmp')
+
+// openRouter.get('/')
+
+/*
+map urls to functions
+for icmp types and codes
+*/
+openRouter.get('/icmps', icmp.getIcmps)
 
 /*
 export express new openRouter object
