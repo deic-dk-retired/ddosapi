@@ -16,8 +16,8 @@ In essence a single app manages operations over *n-instances* of fastnetmon (and
 
 | Function name | Description                    |
 | ------------- | ------------------------------ |
-| `help()`      | Display the __help__ window.   |
-| `destroy()`   | **Destroy your computer!**     |
+| ![Application Overview](app-overview.png)      |                               |
+| ![App Architecture : Scaled Up](scaled.png)   |                                |
 
 ### What is this repository for? ###
 
