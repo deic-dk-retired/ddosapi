@@ -6,13 +6,13 @@ We have a single node application to manage several instance of fastnetmon and c
 
 The following line diagram shows the specific architecture that we have now.
 
-![Alt text](app-overview.png)
+| ![Alt text](app-overview.png)|                                     |                                     |
 
 Also, we write queries in SQL that the node application parses and processes for both PostgreSQL and InfluxDB.  Thus the Node app provides the necessary apis and services that are used by the client application that serves as the GUI.
 
 In essence a single app manages operations over *n-instances* of fastnetmon (and InfluxDB) and *1-instance* of the rules database implemented with PostgreSQL. The line diagram below shows the scaled version of the entire architecture.
 
-![Alt text](scaled.png)
+|![Alt text](scaled.png)|                                     |                                     |
 
 ### What is this repository for? ###
 
