@@ -14,4 +14,4 @@ FROM flow.administrators f
 LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
 WHERE f.administratorid = $(userid)
-AND f.valid = 'TRUE'
+AND f.valid = 'active'

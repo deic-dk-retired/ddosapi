@@ -11,7 +11,9 @@ for customers
 */
 openRouter.get('/customers', customers.getAllCustomers)
 openRouter.get('/customers/:customerid', customers.getOneCustomer)
-
+openRouter.get('/customers/:customerid/relationships/networks', customers.getCustomerNetworks)
+openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
+openRouter.get('/networks', customers.getAllNetworks)
 /*
 export express new openRouter object
 and its methods

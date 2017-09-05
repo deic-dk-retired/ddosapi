@@ -20,6 +20,7 @@ pg-promise stuff
  */
 var options = {
   // Initialization Options
+  // use bluebird promise library
   promiseLib: promise
 }
 var pgp = require('pg-promise')(options)

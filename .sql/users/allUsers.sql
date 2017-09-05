@@ -13,5 +13,5 @@
 FROM flow.administrators as f
 LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
-WHERE f.valid = 'TRUE'
+WHERE f.valid = 'active'
 ORDER BY lastlogin DESC

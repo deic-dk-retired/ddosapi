@@ -1,4 +1,5 @@
 var helmet = require('helmet')
+var compression = require('compression')
 var express = require('express')
 var path = require('path')
 var morgan = require('morgan')
@@ -19,8 +20,9 @@ var fnm = require('./routes/fnm')
 
 var app = express()
 
-app.use(helmet())
 // app.disable('x-powered-by')
+app.use(helmet())
+app.use(compression())
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Credentials', true)
   res.header('Access-Control-Allow-Origin', req.headers.origin)
