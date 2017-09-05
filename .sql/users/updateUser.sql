@@ -4,6 +4,9 @@ SET customerid=$(customerid)
 , name=$(name)
 , phone=$(phone)
 , email=$(email)
-WHERE username = $(username);
+, username=$(username)
+, password=crypt($(password), gen_salt('bf', 10))
+, lastpasswordchange = now()
+WHERE administratorid = $(userid);
 
 COMMIT;
