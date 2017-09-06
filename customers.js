@@ -43,8 +43,8 @@ function getAllCustomers (req, res, next) {
 // uses json api conventions
 // // return all networks of all customers
 function getAllNetworks (req, res, next) {
-  var allNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
-  db.foddb.any(allNetworks)
+  var sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
+  db.foddb.any(sqlallNetworks)
     .then(function (data) {
       // create json api array
       var jsonarr = []
@@ -77,8 +77,8 @@ function getAllNetworks (req, res, next) {
 // uses json api conventions
 // return all networks of a customer based on customerid
 function getCustomerNetworks (req, res, next) {
-  var getCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
-  db.foddb.any(getCustomerNetworks, {customerid: req.params.customerid})
+  var sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
+  db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
     .then(function (data) {
       // create json api array
       var jsonarr = []
