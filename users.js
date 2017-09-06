@@ -41,9 +41,11 @@ function auth (req, res, next) {
 
 // uses json api conventions
 function getAllUsers (req, res, next) {
-  // funtion to return networks for userid in arg
-  function userNet (uid) {
-
+  var reldata = null
+  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  // funtion to return networks for each user
+  function userNetworks (usrid) {
+    return usrid
   }
 
   var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
@@ -65,14 +67,13 @@ function getAllUsers (req, res, next) {
                 self: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/relationships/networks',
                 related: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/networks'
               },
-              data: []
+              data: userNetworks(e.administratorid)
             }
           }
         }
         // remove duplicate id property from attributes
         delete e.administratorid
         jsonobj.attributes = e
-
         jsonarr.push(jsonobj)
       })
 
@@ -94,56 +95,38 @@ function getAllUsers (req, res, next) {
 // uses json api conventions
 function getOneUser (req, res, next) {
   var reldata = null
-  // networks for a user
+  // fetch user networks
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
   db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
-    .then(function (data) {
-      // create json api array
-      var prarr
-      var probj
-      var prores
-      if (data.length > 1) {
-        prarr = []
-        data.map(function (e) {
-          // probj = {
-          //   type: 'networks',
-          //   id: parseInt(e.customernetworkid)
-          // }
-          // remove duplicate id property from attributes
-          // delete e.customernetworkid
-          // probj.attributes = e
-          prarr.push({
-            type: 'networks',
-            id: parseInt(e.customernetworkid)
-          })
-        })
-        reldata = prarr
-      }
-      if (data.length === 1) {
-        // probj = {
-        //   type: 'networks',
-        //   id: parseInt(data[0].customernetworkid)
-        // }
-        // remove duplicate id property from attributes
-        // delete data[0].customernetworkid
-        // probj.attributes = data[0]
-        // prarr = probj
-        reldata = {
+  .then(function (data) {
+    // create json api array
+    var prarr
+    if (data.length > 1) {
+      prarr = []
+      data.map(function (e) {
+        prarr.push({
           type: 'networks',
-          id: parseInt(data[0].customernetworkid)
-        }
+          id: parseInt(e.customernetworkid)
+        })
+      })
+      reldata = prarr
+    }
+    if (data.length === 1) {
+      reldata = {
+        type: 'networks',
+        id: parseInt(data[0].customernetworkid)
       }
-      if (data.length === 0) {
-        // null and not [] as no restriction on
-        // # of networks for each user
-        reldata = null
-      }
-      return reldata
-    })
-    .catch(function (err) {
-      console.error(err.stack)
-      return next(err.message)
-    })
+    }
+    if (data.length === 0) {
+      // null and not []
+      reldata = null
+    }
+    return reldata
+  })
+  .catch(function (err) {
+    console.error(err.stack)
+    return next(err.message)
+  })
 
   // fetch user data
   var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')

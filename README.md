@@ -10,14 +10,14 @@ We have a single node application to manage several instance of fastnetmon and c
 
 The following line diagram shows the specific architecture that we have now for ddos gui.
 
-![Application Overview](app-overview.png)
+![Application Overview](public/readme/app-overview.png)
 
 Also, queries written in SQL are parsed and processed by the applicatiin for both PostgreSQL and InfluxDB. 
 Thus the app provides the necessary API endpoints and services that are used by the client application.
 
 Essentially, a single node app manages operations over *n-instances* of fastnetmon (and InfluxDB) and *1-instance* of the rules database implemented with PostgreSQL. The line diagram below shows the scaled version of the entire architecture.
 
-![App Architecture : Scaled Up](scaled.png)
+![App Architecture : Scaled Up](public/readme/scaled.png)
 
 ### What is this repository for? ###
 
