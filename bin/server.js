@@ -6,7 +6,7 @@ var http = require('http')
 /**
  * Get port from environment and store in Express.
  */
-var port = normalizePort(process.env.PORT || '4242')
+var port = normalizePort(process.env.PORT || process.env.RU_SERVER_PORT)
 app.set('port', port)
 
 /**
