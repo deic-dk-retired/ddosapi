@@ -2,7 +2,7 @@ require('dotenv').config()
 const chalk = require('chalk')
 var promise = require('bluebird')
 const path = require('path')
-var config = require('./config/database')
+// var config = require('./config/database')
 /*
 pg-promise stuff
  */
