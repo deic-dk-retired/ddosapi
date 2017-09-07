@@ -19,6 +19,7 @@ Essentially, a single node app manages operations over *n-instances* of fastnetm
 
 ![App Architecture : Scaled Up](public/readme/scaled.png)
 
+
 ### What is this repository for? ###
 
 * Quick summary
