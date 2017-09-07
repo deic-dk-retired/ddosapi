@@ -41,13 +41,6 @@ function auth (req, res, next) {
 
 // uses json api conventions
 function getAllUsers (req, res, next) {
-  var reldata = null
-  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
-  // funtion to return networks for each user
-  function userNetworks (usrid) {
-    return usrid
-  }
-
   var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
   db.foddb.any(sqlAllUsers)
     .then(function (data) {
@@ -67,7 +60,7 @@ function getAllUsers (req, res, next) {
                 self: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/relationships/networks',
                 related: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/networks'
               },
-              data: userNetworks(e.administratorid)
+              data: []
             }
           }
         }
@@ -94,8 +87,8 @@ function getAllUsers (req, res, next) {
 
 // uses json api conventions
 function getOneUser (req, res, next) {
-  var reldata = null
   // fetch user networks
+  var reldata = null
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
   db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
   .then(function (data) {
