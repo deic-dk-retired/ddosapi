@@ -1,20 +1,8 @@
+require('dotenv').config()
 const chalk = require('chalk')
 var promise = require('bluebird')
 const path = require('path')
-/*
-knexjs.org
- */
-var knex = require('knex')({
-  client: 'pg',
-  version: '9.5',
-  connection: {
-    host: '127.0.0.1',
-    user: 'flowuser',
-    password: 'Gbr(Ff)wCJOF@localhost',
-    database: 'netflow'
-  },
-  debug: true
-})
+// var config = require('./config/database')
 /*
 pg-promise stuff
  */
@@ -24,7 +12,12 @@ var options = {
   promiseLib: promise
 }
 var pgp = require('pg-promise')(options)
-var connectStringFod = 'postgres:flowuser:Gbr(Ff)wCJOF@localhost/netflow'
+var connectStringFod =
+  process.env.RU_DBC + ':' +
+  process.env.RU_USER + ':' +
+  process.env.RU_PWD + '@' +
+  process.env.RU_HOST + '/' +
+  process.env.RU_SCHEMA
 var fodDb = pgp(connectStringFod)
 
 /**
@@ -43,8 +36,8 @@ fodDb.connect()
  */
 var Influx = require('influx')
 var influxClient = new Influx.InfluxDB({
-  host: '172.22.89.2',
-  database: 'graphite'
+  host: process.env.IF_HOST,
+  database: process.env.IF_SCHEMA
 })
 /**
  * check for db graphite on influxdb and show all the dbs listening on
@@ -53,7 +46,7 @@ influxClient.getDatabaseNames()
 .then(function (names) {
   console.log(chalk.hex('#26A69A')('stream1: ' + names.join(', ')))
   if (!names.includes('graphite')) {
-    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/'))
+    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at' + process.env.IF_HOST + ':8083'))
   } else {
     console.log(chalk.hex('#039BE5')('Listening on graphite using influx'))
   }
@@ -67,7 +60,7 @@ influxClient.getDatabaseNames()
  * [npm install influxdb-nodejs]
  */
 var Influxnode = require('influxdb-nodejs')
-var InfluxnodeClient = new Influxnode('http://172.22.89.2:8086/graphite')
+var InfluxnodeClient = new Influxnode('http://' + process.env.IF_HOST + ':8086/' + process.env.IF_SCHEMA)
 /**
  * check for db graphite on influxdb and show all the dbs listening on
  */
@@ -75,7 +68,7 @@ InfluxnodeClient.showDatabases()
 .then(function (names) {
   console.log(chalk.hex('#00897B')('stream2: ' + names.join(', ')))
   if (!names.includes('graphite')) {
-    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at http://172.22.89.2:8083/'))
+    console.log(chalk.redBright('graphite not found, please check the db named grahite exists at' + process.env.IF_HOST + ':8083'))
   } else {
     console.log(chalk.hex('#0277BD')('Listening on graphite using influxdb-nodejs'))
   }
@@ -92,8 +85,6 @@ function miniQuery (file) {
 
 // export as x:function
 module.exports = {
-  secret: 'ash80gossamer30',
-  knex: knex,
   foddb: fodDb,
   influxClient: influxClient,
   // InfluxnodeClient: InfluxnodeClient,
