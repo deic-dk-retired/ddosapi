@@ -1,3 +1,4 @@
+require('dotenv').config()
 var helmet = require('helmet')
 var compression = require('compression')
 var express = require('express')

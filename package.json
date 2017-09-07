@@ -16,6 +16,7 @@
     "compression": "^1.7.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "dotenv": "^4.0.0",
     "express": "^4.15.4",
     "express-session": "^1.15.5",
     "got": "^6.7.1",
