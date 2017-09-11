@@ -5,11 +5,11 @@ var db = require('./db')
 const chalk = require('chalk')
 
 // uses json api conventions
-function authenticate (req, res, next) {
+var authenticate = (req, res, next) => {
   var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   // console.log(chalk.hex('#039BE5')(sqlUserAccess))
   db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
-    .then(function (data) {
+    .then((data) => {
       console.log(chalk.hex('#039BE5')(data))
       res.status(200)
       .json({
@@ -18,15 +18,15 @@ function authenticate (req, res, next) {
         attributes: data
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       return next(err.message)
     })
 }
 
-function auth (req, res, next) {
+var auth = (req, res, next) => {
   var sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
-    .then(function (data) {
+    .then((data) => {
       res.status(200)
       .json({
         type: 'users',
@@ -34,20 +34,21 @@ function auth (req, res, next) {
         attributes: data
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       return next(err.message)
     })
 }
 
 // uses json api conventions
-function getAllUsers (req, res, next) {
+var getAllUsers = (req, res, next) => {
   var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
+  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  var jsonarr = null
+  var jsonobj = {}
   db.foddb.any(sqlAllUsers)
-    .then(function (data) {
+    .then((data) => {
       // create json api array
-      var jsonarr = []
-      var jsonobj
-      data.map(function (e) {
+      jsonarr = data.map((e) => {
         jsonobj = {
           type: 'users',
           id: parseInt(e.administratorid),
@@ -67,9 +68,9 @@ function getAllUsers (req, res, next) {
         // remove duplicate id property from attributes
         delete e.administratorid
         jsonobj.attributes = e
-        jsonarr.push(jsonobj)
+        return jsonobj
+        // jsonarr.push(jsonobj)
       })
-
       // show jsonapi
       res.status(200)
       .json({
@@ -79,93 +80,233 @@ function getAllUsers (req, res, next) {
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
 }
 
-// uses json api conventions
-function getOneUser (req, res, next) {
-  // fetch user networks
-  var reldata = null
+/*
+  refactor to use tasks with
+  parallel promises
+ */
+var getUsers = (req, res, next) => {
+  var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
-  db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
-  .then(function (data) {
-    // create json api array
-    var prarr
-    if (data.length > 1) {
-      prarr = []
-      data.map(function (e) {
-        prarr.push({
-          type: 'networks',
-          id: parseInt(e.customernetworkid)
-        })
-      })
-      reldata = prarr
-    }
-    if (data.length === 1) {
-      reldata = {
-        type: 'networks',
-        id: parseInt(data[0].customernetworkid)
-      }
-    }
-    if (data.length === 0) {
-      // null and not []
-      reldata = null
-    }
-    return reldata
+  var jsonarr = null
+  var jsonobj = {}
+  db.foddb.task('users-task', t => {
+    var users = t.one(sqlAllUsers).then(users => {
+      cosole.log(users)
+      return users
+    })
+    var usersnet = users.then(user => {
+      var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
+      return networks
+    })
+    return Promise.all([users, usersnet]).then(([u, n]) => {
+      // var un
+      // if (n.length > 1) {
+      //   var prarr = []
+      //   n.map((e) => {
+      //     prarr.push({
+      //       type: 'networks',
+      //       id: parseInt(e.customernetworkid)
+      //     })
+      //   })
+      //   un = prarr
+      // }
+      // if (n.length === 1) {
+      //   un = {
+      //     type: 'networks',
+      //     id: parseInt(n[0].customernetworkid)
+      //   }
+      // }
+      // if (n.length === 0) {
+      //   // null and not []
+      //   un = null
+      // }
+      // jsonobj = {
+      //   type: 'users',
+      //   id: parseInt(u.administratorid),
+      //   links: {
+      //     self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
+      //   },
+      //   relationships: {
+      //     networks: {
+      //       links: {
+      //         self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
+      //         related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
+      //       },
+      //       data: un
+      //     }
+      //   }
+      // }
+      // delete u.administratorid
+      // jsonobj.attributes = u
+      // return {user: jsonobj, inc: n}
+    })
   })
-  .catch(function (err) {
+  .then(d => {
+    res.status(200)
+    .json({
+      data: d.user,
+      included: d.inc
+    })
+  })
+  .catch(err => {
     console.error(err.stack)
     return next(err.message)
   })
+}
 
-  // fetch user data
+// uses json api conventions
+var getOneUser = (req, res, next) => {
+  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
   var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
-  db.foddb.one(sqlOneUser, {userid: req.params.userid})
-    .then(function (data) {
-      var jsonobj = {
+  var jsonobj = {}
+  db.foddb.task('usr-task', t => {
+    var users = t.one(sqlOneUser, {userid: req.params.userid}).then(user => {
+      return user
+    })
+    var usernet = users.then(user => {
+      var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
+      return networks
+    })
+    return Promise.all([users, usernet]).then(([u, n]) => {
+      var un
+      if (n.length > 1) {
+        var prarr = []
+        n.map((e) => {
+          prarr.push({
+            type: 'networks',
+            id: parseInt(e.customernetworkid)
+          })
+        })
+        un = prarr
+      }
+      if (n.length === 1) {
+        un = {
+          type: 'networks',
+          id: parseInt(n[0].customernetworkid)
+        }
+      }
+      if (n.length === 0) {
+        // null and not []
+        un = null
+      }
+      jsonobj = {
         type: 'users',
-        id: parseInt(data.administratorid),
+        id: parseInt(u.administratorid),
         links: {
-          self: 'http://10.33.1.97:4242/api/users/' + data.administratorid
+          self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
         },
         relationships: {
           networks: {
             links: {
-              self: 'http://10.33.1.97:4242/api/users/' + data.administratorid + '/relationships/networks',
-              related: 'http://10.33.1.97:4242/api/users/' + data.administratorid + '/networks'
+              self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
+              related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
             },
-            data: reldata
+            data: un
           }
         }
       }
-      // remove duplicate id property from attributes
-      delete data.administratorid
-      jsonobj.attributes = data
-      // show jsonapi
-      res.status(200)
-      .json({
-        data: jsonobj
-      })
+      delete u.administratorid
+      jsonobj.attributes = u
+      return {user: jsonobj, inc: n}
     })
-    .catch(function (err) {
-      console.error(err.stack)
-      return next(err.message)
+  })
+  .then(d => {
+    res.status(200)
+    .json({
+      data: d.user,
+      included: d.inc
     })
+  })
+  .catch(err => {
+    console.error(err.stack)
+    return next(err.message)
+  })
 }
 
-function getUserNetworks (req, res, next) {
+var getUser = (req, res, next) => {
+  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
+  var jsonobj = {}
+  db.foddb.task('usr-task', t => {
+    var users = t.one(sqlOneUser, {userid: req.params.userid}).then(user => {
+      return user
+    })
+    var usernet = users.then(user => {
+      var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
+      return networks
+    })
+    return Promise.all([users, usernet]).then(([u, n]) => {
+      var un
+      if (n.length > 1) {
+        var prarr = []
+        n.map((e) => {
+          prarr.push({
+            type: 'networks',
+            id: parseInt(e.customernetworkid)
+          })
+        })
+        un = prarr
+      }
+      if (n.length === 1) {
+        un = {
+          type: 'networks',
+          id: parseInt(n[0].customernetworkid)
+        }
+      }
+      if (n.length === 0) {
+        // null and not []
+        un = null
+      }
+      jsonobj = {
+        type: 'users',
+        id: parseInt(u.administratorid),
+        links: {
+          self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
+        },
+        relationships: {
+          networks: {
+            links: {
+              self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
+              related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
+            },
+            data: un
+          }
+        }
+      }
+      delete u.administratorid
+      jsonobj.attributes = u
+      return {user: jsonobj, inc: n}
+    })
+  })
+  .then(d => {
+    res.status(200)
+    .json({
+      data: d.user,
+      included: d.inc
+    })
+  })
+  .catch(err => {
+    console.error(err.stack)
+    return next(err.message)
+  })
+}
+
+var getUserNetworks = (req, res, next) => {
+  var prarr = null
+  var probj = null
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
   db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
-    .then(function (data) {
+    .then((data) => {
       // create pr api array
-      var prarr
-      var probj
       if (data.length > 1) {
         prarr = []
-        data.map(function (e) {
+        data.map((e) => {
           probj = {
             type: 'networks',
             id: parseInt(e.customernetworkid)
@@ -194,18 +335,18 @@ function getUserNetworks (req, res, next) {
       res.status(200)
       .json({
         links: {
-          self: 'http://10.33.1.97:4242/api/networks/' + req.params.userid
+          self: 'http://10.33.1.97:4242/api/users/' + req.params.userid + '/networks'
         },
         data: prarr
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
 }
 
-function updateUser (req, res, next) {
+var updateUser = (req, res, next) => {
   // fetch user details before updating
   var sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
   db.foddb.any(sqlUpdateUser,
@@ -218,7 +359,7 @@ function updateUser (req, res, next) {
       password: req.body.password,
       userid: parseInt(req.params.userid)
     })
-    .then(function () {
+    .then(() => {
       res.status(200)
       .json({
         meta: {
@@ -227,13 +368,13 @@ function updateUser (req, res, next) {
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
 }
 
-function createUser (req, res, next) {
+var createUser = (req, res, next) => {
   var sqlCreateUser = db.miniQuery('.sql/users/createUser.sql')
   db.foddb.none(sqlCreateUser,
     { customerid: parseInt(req.body.customerid),
@@ -244,7 +385,7 @@ function createUser (req, res, next) {
       username: req.body.username,
       password: req.body.password
     })
-    .then(function () {
+    .then(() => {
       res.status(200)
       .json({
         meta: {
@@ -257,16 +398,16 @@ function createUser (req, res, next) {
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
 }
 
-function removeUser (req, res, next) {
+var removeUser = (req, res, next) => {
   var sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
   db.foddb.result(sqlDeleteUser, {username: req.params.username})
-    .then(function (result) {
+    .then((result) => {
       res.status(200)
       .json({
         meta: {
@@ -275,19 +416,22 @@ function removeUser (req, res, next) {
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
 }
 
-module.exports = {
+var users = {
   authenticate: authenticate,
   auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
+  getUsers: getUsers,
   getUserNetworks: getUserNetworks,
   createUser: createUser,
   updateUser: updateUser,
   removeUser: removeUser
 }
+
+module.exports = users

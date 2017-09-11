@@ -1,7 +1,6 @@
 var app = require('../app')
 var debug = require('debug')('node-postgres-promises:server')
 var http = require('http')
-// var io = require('socket.io')
 
 /**
  * Get port from environment and store in Express.
@@ -13,17 +12,20 @@ app.set('port', port)
  * Create HTTP server.
  */
 var server = http.Server(app)
-
+var io = require('socket.io')(server)
 /**
  * Listen on provided port, on all network interfaces.
  */
 server.listen(port)
 server.on('error on', onError)
 server.on('listening on', onListening)
-// io = io.listen(server)
-// io.on('connection', function (socket) {
-//   console.log('socket io')
-// })
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' })
+  socket.on('my other event', function (data) {
+    console.log(data)
+  })
+})
 
 /**
  * Normalize a port into a number, string, or false.
