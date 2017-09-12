@@ -2,7 +2,8 @@
 // query handler method
 
 var db = require('./db')
-const chalk = require('chalk')
+// const chalk = require('chalk')
+// var db.promise = require('bluebird')
 
 // uses json api conventions
 var authenticate = (req, res, next) => {
@@ -10,7 +11,7 @@ var authenticate = (req, res, next) => {
   // console.log(chalk.hex('#039BE5')(sqlUserAccess))
   db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then((data) => {
-      console.log(chalk.hex('#039BE5')(data))
+      console.log(db.chalk.hex('#039BE5')(data))
       res.status(200)
       .json({
         type: 'users',
@@ -43,12 +44,47 @@ var auth = (req, res, next) => {
 var getAllUsers = (req, res, next) => {
   var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
-  var jsonarr = null
+  var jsonarr = []
   var jsonobj = {}
-  db.foddb.any(sqlAllUsers)
-    .then((data) => {
-      // create json api array
-      jsonarr = data.map((e) => {
+  db.foddb.task('users-task', t => {
+    var prUsers = t.any(sqlAllUsers).then(users => {
+      return users
+    })
+    var prUsersNet = prUsers.map(u => {
+      var networks = t.any(sqlUserNetworks, {userid: u.administratorid})
+      return networks
+    })
+
+    return db.promise.all([prUsers, prUsersNet]).then(([u, n]) => {
+      var usernets = n.map((e) => {
+        var un
+        if (e.length > 1) {
+          var prarr = []
+          e.map((f) => {
+            var nobj = {
+              type: 'networks',
+              id: parseInt(f.customernetworkid)
+            }
+            delete f.customernetworkid
+            nobj.attributes = f
+            prarr.push(nobj)
+          })
+          un = prarr
+        }
+        if (e.length === 1) {
+          un = [{
+            type: 'networks',
+            id: parseInt(e[0].customernetworkid)
+          }]
+          delete e[0].customernetworkid
+          un[0].attributes = e
+        }
+        if (e.length === 0) {
+          un = []
+        }
+        return un
+      })
+      jsonarr = u.map((e, i) => {
         jsonobj = {
           type: 'users',
           id: parseInt(e.administratorid),
@@ -61,96 +97,105 @@ var getAllUsers = (req, res, next) => {
                 self: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/relationships/networks',
                 related: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/networks'
               },
-              data: []
+              data: usernets[i].map((e) => { return { type: e.type, id: e.id } })
             }
           }
         }
-        // remove duplicate id property from attributes
         delete e.administratorid
         jsonobj.attributes = e
         return jsonobj
-        // jsonarr.push(jsonobj)
       })
-      // show jsonapi
-      res.status(200)
-      .json({
-        data: jsonarr,
-        meta: {
-          total: data.length
-        }
-      })
-    })
-    .catch((err) => {
-      console.error(err.stack)
-      return next(err.message)
-    })
-}
-
-/*
-  refactor to use tasks with
-  parallel promises
- */
-var getUsers = (req, res, next) => {
-  var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
-  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
-  var jsonarr = null
-  var jsonobj = {}
-  db.foddb.task('users-task', t => {
-    var users = t.one(sqlAllUsers).then(users => {
-      cosole.log(users)
-      return users
-    })
-    var usersnet = users.then(user => {
-      var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
-      return networks
-    })
-    return Promise.all([users, usersnet]).then(([u, n]) => {
-      // var un
-      // if (n.length > 1) {
-      //   var prarr = []
-      //   n.map((e) => {
-      //     prarr.push({
-      //       type: 'networks',
-      //       id: parseInt(e.customernetworkid)
-      //     })
-      //   })
-      //   un = prarr
-      // }
-      // if (n.length === 1) {
-      //   un = {
-      //     type: 'networks',
-      //     id: parseInt(n[0].customernetworkid)
-      //   }
-      // }
-      // if (n.length === 0) {
-      //   // null and not []
-      //   un = null
-      // }
-      // jsonobj = {
-      //   type: 'users',
-      //   id: parseInt(u.administratorid),
-      //   links: {
-      //     self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
-      //   },
-      //   relationships: {
-      //     networks: {
-      //       links: {
-      //         self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
-      //         related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
-      //       },
-      //       data: un
-      //     }
-      //   }
-      // }
-      // delete u.administratorid
-      // jsonobj.attributes = u
-      // return {user: jsonobj, inc: n}
+      return {users: jsonarr, inc: usernets.filter((e) => { return e.length > 1 })}
     })
   })
   .then(d => {
     res.status(200)
     .json({
-      data: d.user,
+      data: d.users,
+      included: d.inc.map((e) => { return e.map((f) => { return f }) })
+    })
+  })
+  .catch(err => {
+    console.error(err.stack)
+    return next(err.message)
+  })
+}
+
+/*
+  refactor to use tasks with
+  parallel db.promises
+ */
+var _getUsers = (req, res, next) => {
+  var sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
+  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  var jsonarr = []
+  var jsonobj = {}
+  db.foddb.task('users-task', t => {
+    var prUsers = t.any(sqlAllUsers).then(users => {
+      return users
+    })
+    var prUsersNet = prUsers.map(u => {
+      var networks = t.any(sqlUserNetworks, {userid: u.administratorid})
+      return networks
+    })
+
+    return db.promise.all([prUsers, prUsersNet]).then(([u, n]) => {
+      var usernets = n.map((e) => {
+        var un
+        if (e.length > 1) {
+          var prarr = []
+          e.map((f) => {
+            var nobj = {
+              type: 'networks',
+              id: parseInt(f.customernetworkid)
+            }
+            delete f.customernetworkid
+            nobj.attributes = f
+            prarr.push(nobj)
+          })
+          un = prarr
+        }
+        if (e.length === 1) {
+          un = [{
+            type: 'networks',
+            id: parseInt(e[0].customernetworkid)
+          }]
+          delete e[0].customernetworkid
+          un[0].attributes = e
+        }
+        if (e.length === 0) {
+          un = []
+        }
+        return un
+      })
+      jsonarr = u.map((e, i) => {
+        jsonobj = {
+          type: 'users',
+          id: parseInt(e.administratorid),
+          links: {
+            self: 'http://10.33.1.97:4242/api/users/' + e.administratorid
+          },
+          relationships: {
+            networks: {
+              links: {
+                self: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/relationships/networks',
+                related: 'http://10.33.1.97:4242/api/users/' + e.administratorid + '/networks'
+              },
+              data: usernets[i].map((e) => { return { type: e.type, id: e.id } })
+            }
+          }
+        }
+        delete e.administratorid
+        jsonobj.attributes = e
+        return jsonobj
+      })
+      return {users: jsonarr, inc: usernets.filter((e) => { return e.length > 1 })}
+    })
+  })
+  .then(d => {
+    res.status(200)
+    .json({
+      data: d.users,
       included: d.inc
     })
   })
@@ -173,31 +218,40 @@ var getOneUser = (req, res, next) => {
       var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
       return networks
     })
-    return Promise.all([users, usernet]).then(([u, n]) => {
+    return db.promise.all([users, usernet]).then(([u, n]) => {
       var un
+      n.forEach(e => {
+        e.customernetworkid = parseInt(e.customernetworkid)
+        e.customerid = parseInt(e.customerid)
+        e.administratorid = parseInt(e.administratorid)
+      })
       if (n.length > 1) {
         var prarr = []
         n.map((e) => {
-          prarr.push({
+          var nobj = {
             type: 'networks',
-            id: parseInt(e.customernetworkid)
-          })
+            id: e.customernetworkid
+          }
+          delete e.customernetworkid
+          nobj.attributes = e
+          prarr.push(nobj)
         })
         un = prarr
       }
       if (n.length === 1) {
-        un = {
+        un = [{
           type: 'networks',
-          id: parseInt(n[0].customernetworkid)
-        }
+          id: n[0].customernetworkid
+        }]
+        delete n[0].customernetworkid
+        un[0].attributes = n[0]
       }
       if (n.length === 0) {
-        // null and not []
-        un = null
+        un = []
       }
       jsonobj = {
         type: 'users',
-        id: parseInt(u.administratorid),
+        id: u.administratorid,
         links: {
           self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
         },
@@ -207,13 +261,13 @@ var getOneUser = (req, res, next) => {
               self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
               related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
             },
-            data: un
+            data: un.map((e) => { return { type: e.type, id: e.id } })
           }
         }
       }
       delete u.administratorid
       jsonobj.attributes = u
-      return {user: jsonobj, inc: n}
+      return {user: jsonobj, inc: un}
     })
   })
   .then(d => {
@@ -229,7 +283,7 @@ var getOneUser = (req, res, next) => {
   })
 }
 
-var getUser = (req, res, next) => {
+var _getUser = (req, res, next) => {
   var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
   var sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
   var jsonobj = {}
@@ -241,31 +295,40 @@ var getUser = (req, res, next) => {
       var networks = t.any(sqlUserNetworks, {userid: user.administratorid})
       return networks
     })
-    return Promise.all([users, usernet]).then(([u, n]) => {
+    return db.promise.all([users, usernet]).then(([u, n]) => {
       var un
+      n.forEach(e => {
+        e.customernetworkid = parseInt(e.customernetworkid)
+        e.customerid = parseInt(e.customerid)
+        e.administratorid = parseInt(e.administratorid)
+      })
       if (n.length > 1) {
         var prarr = []
         n.map((e) => {
-          prarr.push({
+          var nobj = {
             type: 'networks',
-            id: parseInt(e.customernetworkid)
-          })
+            id: e.customernetworkid
+          }
+          delete e.customernetworkid
+          nobj.attributes = e
+          prarr.push(nobj)
         })
         un = prarr
       }
       if (n.length === 1) {
-        un = {
+        un = [{
           type: 'networks',
-          id: parseInt(n[0].customernetworkid)
-        }
+          id: n[0].customernetworkid
+        }]
+        delete n[0].customernetworkid
+        un[0].attributes = n[0]
       }
       if (n.length === 0) {
-        // null and not []
-        un = null
+        un = []
       }
       jsonobj = {
         type: 'users',
-        id: parseInt(u.administratorid),
+        id: u.administratorid,
         links: {
           self: 'http://10.33.1.97:4242/api/users/' + u.administratorid
         },
@@ -275,13 +338,13 @@ var getUser = (req, res, next) => {
               self: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/relationships/networks',
               related: 'http://10.33.1.97:4242/api/users/' + u.administratorid + '/networks'
             },
-            data: un
+            data: un.map((e) => { return { type: e.type, id: e.id } })
           }
         }
       }
       delete u.administratorid
       jsonobj.attributes = u
-      return {user: jsonobj, inc: n}
+      return {user: jsonobj, inc: un}
     })
   })
   .then(d => {
@@ -427,7 +490,6 @@ var users = {
   auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
-  getUsers: getUsers,
   getUserNetworks: getUserNetworks,
   createUser: createUser,
   updateUser: updateUser,
