@@ -112,7 +112,7 @@ var getAllUsers = (req, res, next) => {
     res.status(200)
     .json({
       data: d.users,
-      included: d.inc.map((e) => { return e.map((f) => { return f }) })
+      included: d.inc.reduce((n, i) => { return n.concat(i) })
     })
   })
   .catch(err => {
