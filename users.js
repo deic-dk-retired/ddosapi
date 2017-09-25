@@ -309,8 +309,8 @@ const getUserNetworks = (req, res, next) => {
     })
 }
 
-var updateUser = (req, res, next) => {
-  var sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
+const updateUser = (req, res, next) => {
+  const sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
   db.foddb.any(sqlUpdateUser,
     { customerid: parseInt(req.body.customerid),
       kind: req.body.kind,
@@ -336,8 +336,8 @@ var updateUser = (req, res, next) => {
     })
 }
 
-var createUser = (req, res, next) => {
-  var sqlCreateUser = db.miniQuery('.sql/users/createUser.sql')
+const createUser = (req, res, next) => {
+  const sqlCreateUser = db.miniQuery('.sql/users/createUser.sql')
   db.foddb.none(sqlCreateUser,
     { customerid: parseInt(req.body.customerid),
       kind: req.body.kind,
@@ -366,8 +366,8 @@ var createUser = (req, res, next) => {
     })
 }
 
-var removeUser = (req, res, next) => {
-  var sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
+const removeUser = (req, res, next) => {
+  const sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
   db.foddb.result(sqlDeleteUser, {username: req.params.username})
     .then((result) => {
       res.status(200)
@@ -384,7 +384,7 @@ var removeUser = (req, res, next) => {
     })
 }
 
-var users = {
+const users = {
   authenticate: authenticate,
   auth: auth,
   getAllUsers: getAllUsers,
