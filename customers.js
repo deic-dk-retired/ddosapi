@@ -2,14 +2,15 @@
 // query handler method
 
 var db = require('./db')
+const url = 'http://10.33.1.97:4242/api/customers/'
 
 // uses json api conventions
-function getAllCustomers (req, res, next) {
+const getAllCustomers = (req, res, next) => {
   /*
   #todo: get customer and customer networks
   #todo: sideload relations
   */
-  var sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
+  const sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
   db.foddb.any(sqlAllCustomers)
     .then(function (data) {
       // create json api array
@@ -42,7 +43,7 @@ function getAllCustomers (req, res, next) {
 
 // uses json api conventions
 // // return all networks of all customers
-function getAllNetworks (req, res, next) {
+const getAllNetworks = (req, res, next) => {
   var sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
   db.foddb.any(sqlallNetworks)
     .then(function (data) {
@@ -76,8 +77,8 @@ function getAllNetworks (req, res, next) {
 
 // uses json api conventions
 // return all networks of a customer based on customerid
-function getCustomerNetworks (req, res, next) {
-  var sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
+const getCustomerNetworks = (req, res, next) => {
+  const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
   db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
     .then(function (data) {
       // create json api array
@@ -109,12 +110,12 @@ function getCustomerNetworks (req, res, next) {
 }
 
 // uses json api conventions
-function getOneCustomer (req, res, next) {
+const getOneCustomer = (req, res, next) => {
   /*
   #todo: get customer and customer networks
   #todo: sideload relations
   */
-  var sqlOneCustomer = db.miniQuery('.sql/customers/oneCustomer.sql')
+  const sqlOneCustomer = db.miniQuery('.sql/customers/oneCustomer.sql')
   db.foddb.one(sqlOneCustomer, {customerid: req.params.customerid})
     .then(function (data) {
       var jsonobj = {
@@ -136,20 +137,49 @@ function getOneCustomer (req, res, next) {
     })
 }
 
-function createCustomer (req, res, next) {
+const createCustomer = (req, res, next) => {
   // add customer info
   // add customer networks
 
 }
 
-function updateCustomer (req, res, next) {
+const updateCustomer = (req, res, next) => {
   // update customer info
   // update customer networks
 }
 
-function removeCustomer (req, res, next) {
+const removeCustomer = (req, res, next) => {
   // delete customer info
   // delete customer networks
+}
+
+const createNetwork = (req, res, next) => {
+  // add customer networks
+  var sqlCreateNetwork = db.miniQuery('.sql/customers/sqlCreateNetwork.sql')
+  db.foddb.none(sqlCreateNetwork,
+    { customerid: parseInt(req.body.customerid),
+      name: req.body.name,
+      kind: req.body.kind,
+      net: req.body.net,
+      description: req.body.desc
+    })
+    .then(() => {
+      res.status(201)
+      .json({
+        meta: {
+          status: 'successfully created network',
+          message: {
+            name: req.body.name,
+            kind: req.body.kind,
+            net: req.body.net
+          }
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack)
+      return next(err.message)
+    })
 }
 
 module.exports = {
@@ -159,5 +189,6 @@ module.exports = {
   getOneCustomer: getOneCustomer,
   createCustomer: createCustomer,
   updateCustomer: updateCustomer,
-  removeCustomer: removeCustomer
+  removeCustomer: removeCustomer,
+  createNetwork: createNetwork
 }

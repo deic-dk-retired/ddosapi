@@ -14,6 +14,7 @@ openRouter.get('/customers/:customerid', customers.getOneCustomer)
 openRouter.get('/customers/:customerid/relationships/networks', customers.getCustomerNetworks)
 openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
 openRouter.get('/networks', customers.getAllNetworks)
+openRouter.patch('/networks', customers.createNetwork)
 /*
 export express new openRouter object
 and its methods

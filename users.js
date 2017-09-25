@@ -7,7 +7,6 @@ const authenticate = (req, res, next) => {
   const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
     .then((data) => {
-      console.log(db.chalk.hex('#039BE5')(data))
       res.status(200)
         .json({
           type: 'users',
@@ -141,15 +140,16 @@ const getAllUsers = (req, res, next) => {
         }
         return 0
       })
-      var sortinc = mapped.map((e) => {
+      let sortinc = mapped.map((e) => {
         return inc[e.i]
       })
+      var uniq = sortinc.filter((item, index, self) => { return self.findIndex(obj => { return obj.id === item.id }) === index })
     }
     res.status(200)
     if (isQueried) {
       res.json({
         data: d.users,
-        included: sortinc
+        included: uniq
       })
     } else {
       res.json({
@@ -284,7 +284,6 @@ const getUserNetworks = (req, res, next) => {
         })
       }
       if (data.length === 1) {
-        console.log(data)
         probj = {
           type: 'networks',
           id: parseInt(data[0].customernetworkid)
@@ -349,7 +348,7 @@ var createUser = (req, res, next) => {
       password: req.body.password
     })
     .then(() => {
-      res.status(200)
+      res.status(201)
       .json({
         meta: {
           status: 'successfully created user',
