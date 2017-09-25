@@ -1,6 +1,6 @@
 require('dotenv').config()
 const chalk = require('chalk')
-var promise = require('bluebird')
+const promise = require('bluebird')
 const path = require('path')
 // var config = require('./config/database')
 /*
@@ -88,5 +88,7 @@ module.exports = {
   foddb: fodDb,
   influxClient: influxClient,
   // InfluxnodeClient: InfluxnodeClient,
-  miniQuery: miniQuery
+  miniQuery: miniQuery,
+  promise: promise,
+  chalk: chalk
 }

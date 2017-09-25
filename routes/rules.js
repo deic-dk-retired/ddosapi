@@ -1,7 +1,7 @@
-var express = require('express')
-var openRouter = express.Router()
+const express = require('express')
+const openRouter = express.Router()
 
-var rules = require('../rules')
+const rules = require('../rules')
 
 // openRouter.get('/')
 

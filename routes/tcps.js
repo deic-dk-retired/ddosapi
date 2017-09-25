@@ -1,7 +1,7 @@
-var express = require('express')
-var openRouter = express.Router()
+const express = require('express')
+const openRouter = express.Router()
 
-var tcp = require('../tcp')
+const tcp = require('../tcp')
 
 // openRouter.get('/')
 
