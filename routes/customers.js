@@ -1,8 +1,7 @@
-var express = require('express')
-var openRouter = express.Router()
+const express = require('express')
+const openRouter = express.Router()
 
-var customers = require('../customers')
-
+const customers = require('../customers')
 // openRouter.get('/')
 
 /**
@@ -14,7 +13,7 @@ openRouter.get('/customers/:customerid', customers.getOneCustomer)
 openRouter.get('/customers/:customerid/relationships/networks', customers.getCustomerNetworks)
 openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
 openRouter.get('/networks', customers.getAllNetworks)
-openRouter.patch('/networks', customers.createNetwork)
+openRouter.post('/networks', customers.createNetwork)
 /*
 export express new openRouter object
 and its methods

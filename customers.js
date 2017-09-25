@@ -1,7 +1,4 @@
-// connect to db and then get the
-// query handler method
-
-var db = require('./db')
+const db = require('./db')
 const url = 'http://10.33.1.97:4242/api/customers/'
 
 // uses json api conventions
@@ -44,7 +41,7 @@ const getAllCustomers = (req, res, next) => {
 // uses json api conventions
 // // return all networks of all customers
 const getAllNetworks = (req, res, next) => {
-  var sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
+  const sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
   db.foddb.any(sqlallNetworks)
     .then(function (data) {
       // create json api array
@@ -154,8 +151,7 @@ const removeCustomer = (req, res, next) => {
 }
 
 const createNetwork = (req, res, next) => {
-  // add customer networks
-  var sqlCreateNetwork = db.miniQuery('.sql/customers/sqlCreateNetwork.sql')
+  const sqlCreateNetwork = db.miniQuery('.sql/customers/sqlCreateNetwork.sql')
   db.foddb.none(sqlCreateNetwork,
     { customerid: parseInt(req.body.customerid),
       name: req.body.name,
@@ -182,7 +178,7 @@ const createNetwork = (req, res, next) => {
     })
 }
 
-module.exports = {
+const customers = {
   getAllCustomers: getAllCustomers,
   getAllNetworks: getAllNetworks,
   getCustomerNetworks: getCustomerNetworks,
@@ -192,3 +188,5 @@ module.exports = {
   removeCustomer: removeCustomer,
   createNetwork: createNetwork
 }
+
+module.exports = customers

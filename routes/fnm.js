@@ -1,7 +1,7 @@
-var express = require('express')
-var openRouter = express.Router()
+const express = require('express')
+const openRouter = express.Router()
 
-var fnm = require('../fnm')
+const fnm = require('../fnm')
 
 // openRouter.get('/')
 

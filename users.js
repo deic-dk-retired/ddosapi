@@ -1,5 +1,3 @@
-// connect to db and then get
-// promises, query handler
 const db = require('./db')
 const url = 'http://10.33.1.97:4242/api/users/'
 
