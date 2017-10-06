@@ -14,6 +14,8 @@ openRouter.get('/customers/:customerid/relationships/networks', customers.getCus
 openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
 openRouter.get('/networks', customers.getAllNetworks)
 openRouter.post('/networks', customers.createNetwork)
+openRouter.delete('/networks/:netid', customers.removeNetwork)
+
 /*
 export express new openRouter object
 and its methods

@@ -1,34 +1,35 @@
 require('dotenv').config()
-var helmet = require('helmet')
-var compression = require('compression')
-var express = require('express')
-var path = require('path')
-var morgan = require('morgan')
-var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
-// var methodOverride = require('method-override')
-// var session = require('express-session')
-var passport = require('passport')
-var jwt = require('jwt-simple')
-// var LocalStrategy = require('passport-local')
-var index = require('./routes/index')
-var tcps = require('./routes/tcps')
-var icmps = require('./routes/icmps')
-var users = require('./routes/users')
-var rules = require('./routes/rules')
-var customers = require('./routes/customers')
-var fnm = require('./routes/fnm')
 
-var app = express()
+const helmet = require('helmet')
+const compression = require('compression')
+const express = require('express')
+const path = require('path')
+const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+// const methodOverride = require('method-override')
+// const session = require('express-session')
+const passport = require('passport')
+const jwt = require('jwt-simple')
+// const LocalStrategy = require('passport-local')
+const index = require('./routes/index')
+const tcps = require('./routes/tcps')
+const icmps = require('./routes/icmps')
+const users = require('./routes/users')
+const rules = require('./routes/rules')
+const customers = require('./routes/customers')
+const fnm = require('./routes/fnm')
+const app = express()
 
 // app.disable('x-powered-by')
 app.use(helmet())
 app.use(compression())
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Credentials', true)
-  res.header('Access-Control-Allow-Origin', req.headers.origin)
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+  res.header('Access-Control-Allow-Origin', req.headers.origin)
+  res.header('Content-Type', 'application/vnd.api+json')
+  res.header('Access-Control-Allow-Credentials', true)
   next()
 })
 
@@ -55,9 +56,9 @@ app.use('/api', fnm)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  var err = req.session.error
-  var msg = req.session.notice
-  var success = req.session.success
+  let err = req.session.error
+  let msg = req.session.notice
+  let success = req.session.success
 
   delete req.session.error
   delete req.session.success

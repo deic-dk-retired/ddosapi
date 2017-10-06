@@ -1,3 +1,4 @@
+const moment = require('moment')
 const db = require('./db')
 const url = 'http://10.33.1.97:4242/api/rules/'
 
@@ -7,7 +8,7 @@ const getRules = (req, res, next) => {
   let jsonarr = []
   let jsonobj = {}
   let recs = 10
-  let offset = 8 // rows to skip, same as # of recent rules to fetch
+  let offset = 0 // rows to skip, same as # of recent rules to fetch
   let nxt = 0
   if (req.query.page !== undefined) {
     nxt = (parseInt(req.query.page) - 1)
@@ -31,6 +32,8 @@ const getRules = (req, res, next) => {
           }
         }
         delete e.id
+        e.validfrom = moment(e.validfrom).format()
+        e.validto = moment(e.validto).format()
         jsonobj.attributes = e
         return jsonobj
       })

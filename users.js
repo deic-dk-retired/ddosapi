@@ -366,13 +366,13 @@ const createUser = (req, res, next) => {
 
 const removeUser = (req, res, next) => {
   const sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
-  db.foddb.result(sqlDeleteUser, {username: req.params.username})
+  db.foddb.result(sqlDeleteUser, {userid: req.params.userid})
     .then((result) => {
       res.status(200)
       .json({
         meta: {
           status: 'success',
-          message: 'Removed user: ' + req.params.username
+          message: 'Removed user: ' + req.params.userid
         }
       })
     })

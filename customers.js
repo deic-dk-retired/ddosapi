@@ -146,18 +146,31 @@ const updateCustomer = (req, res, next) => {
 }
 
 const removeCustomer = (req, res, next) => {
-  // delete customer info
-  // delete customer networks
+  const sqlDeleteCo = db.miniQuery('.sql/users/deleteCustomer.sql')
+  db.foddb.result(sqlDeleteCo, {coid: req.params.coid})
+    .then((result) => {
+      res.status(200)
+      .json({
+        meta: {
+          status: 'success',
+          message: 'Removed customer: ' + req.params.coid
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack)
+      return next(err.message)
+    })
 }
 
 const createNetwork = (req, res, next) => {
-  const sqlCreateNetwork = db.miniQuery('.sql/customers/sqlCreateNetwork.sql')
+  const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
   db.foddb.none(sqlCreateNetwork,
-    { customerid: parseInt(req.body.customerid),
-      name: req.body.name,
-      kind: req.body.kind,
-      net: req.body.net,
-      description: req.body.desc
+    { coid: parseInt(req.body.coid),
+      coname: req.body.coname,
+      cokind: req.body.cokind,
+      conet: req.body.conet,
+      codesc: req.body.codesc
     })
     .then(() => {
       res.status(201)
@@ -165,10 +178,27 @@ const createNetwork = (req, res, next) => {
         meta: {
           status: 'successfully created network',
           message: {
-            name: req.body.name,
-            kind: req.body.kind,
-            net: req.body.net
+            name: req.body.coname,
+            kind: req.body.cokind,
+            net: req.body.conet
           }
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack)
+      return next(err.message)
+    })
+}
+
+const removeNetwork = (req, res, next) => {
+  const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteCustomerNetwork.sql')
+  db.foddb.none(sqlRemoveNetwork, {netid: parseInt(req.params.netid)})
+    .then(() => {
+      res.status(201)
+      .json({
+        meta: {
+          status: 'successfully removed network'
         }
       })
     })
@@ -186,7 +216,8 @@ const customers = {
   createCustomer: createCustomer,
   updateCustomer: updateCustomer,
   removeCustomer: removeCustomer,
-  createNetwork: createNetwork
+  createNetwork: createNetwork,
+  removeNetwork: removeNetwork
 }
 
 module.exports = customers
