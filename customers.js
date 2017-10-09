@@ -166,10 +166,10 @@ const createNetwork = (req, res, next) => {
   const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
   db.foddb.one(sqlCreateNetwork,
     { coid: parseInt(req.body.coid),
-      coname: req.body.coname,
-      cokind: req.body.cokind,
-      conet: req.body.conet,
-      codesc: req.body.codesc
+      netname: req.body.netname,
+      netkind: req.body.netkind,
+      netaddr: req.body.netaddr,
+      netdesc: req.body.netdesc
     })
     .then((d) => {
       var jsonobj
