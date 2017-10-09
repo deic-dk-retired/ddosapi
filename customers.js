@@ -78,7 +78,6 @@ const getCustomerNetworks = (req, res, next) => {
   const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
   db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
     .then(function (data) {
-      // create json api array
       var jsonarr = []
       var jsonobj
       data.map(function (e) {
@@ -165,23 +164,26 @@ const removeCustomer = (req, res, next) => {
 
 const createNetwork = (req, res, next) => {
   const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
-  db.foddb.none(sqlCreateNetwork,
+  db.foddb.one(sqlCreateNetwork,
     { coid: parseInt(req.body.coid),
       coname: req.body.coname,
       cokind: req.body.cokind,
       conet: req.body.conet,
       codesc: req.body.codesc
     })
-    .then(() => {
+    .then((d) => {
+      var jsonobj
+      jsonobj = {
+        type: 'networks',
+        id: parseInt(d.customernetworkid)
+      }
+      delete d.customernetworkid
+      jsonobj.attributes = d
       res.status(201)
       .json({
+        data: jsonobj,
         meta: {
-          status: 'successfully created network',
-          message: {
-            name: req.body.coname,
-            kind: req.body.cokind,
-            net: req.body.conet
-          }
+          message: 'Successfully created network ' + jsonobj.attributes.name
         }
       })
     })
@@ -195,7 +197,7 @@ const removeNetwork = (req, res, next) => {
   const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteCustomerNetwork.sql')
   db.foddb.none(sqlRemoveNetwork, {netid: parseInt(req.params.netid)})
     .then(() => {
-      res.status(201)
+      res.status(200)
       .json({
         meta: {
           status: 'successfully removed network'
