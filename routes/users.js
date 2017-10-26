@@ -17,7 +17,6 @@ openRouter.get('/users/:userid/relationships/networks', users.getUserNetworks)
 openRouter.get('/users/:userid/networks', users.getUserNetworks)
 openRouter.post('/users', users.createUser)
 openRouter.patch('/users/:userid', users.updateUser)
-openRouter.delete('/users/:userid', users.removeUser)
 
 /*
 export express new openRouter object

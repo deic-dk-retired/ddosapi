@@ -19,6 +19,7 @@ const users = require('./routes/users')
 const rules = require('./routes/rules')
 const customers = require('./routes/customers')
 const fnm = require('./routes/fnm')
+const stats = require('./routes/stats')
 const app = express()
 
 // app.disable('x-powered-by')
@@ -53,6 +54,7 @@ app.use('/api', users)
 app.use('/api', rules)
 app.use('/api', customers)
 app.use('/api', fnm)
+app.use('/api', stats)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

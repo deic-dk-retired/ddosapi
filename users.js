@@ -309,14 +309,16 @@ const getUserNetworks = (req, res, next) => {
 
 const updateUser = (req, res, next) => {
   const sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
+  const sqlUpdateUserNetworks = db.miniQuery('.sql/users/updateUserNetworks.sql')
+
+  // insert into networkrights for each id
+
   db.foddb.any(sqlUpdateUser,
-    { customerid: parseInt(req.body.customerid),
+    { couuid: req.body.couuid,
+      coid: parseInt(req.body.coid),
       kind: req.body.kind,
-      name: req.body.name,
-      phone: req.body.phone,
-      email: req.body.email,
-      username: req.body.username,
-      password: req.body.password,
+      useruuid: req.body.useruuid,
+      valid: req.body.valid,
       userid: parseInt(req.params.userid)
     })
     .then(() => {
@@ -324,7 +326,7 @@ const updateUser = (req, res, next) => {
       .json({
         meta: {
           status: 'success',
-          message: 'User ' + req.body.username + ' modified'
+          message: 'User ' + req.params.userid + ' modified'
         }
       })
     })
@@ -364,24 +366,6 @@ const createUser = (req, res, next) => {
     })
 }
 
-const removeUser = (req, res, next) => {
-  const sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
-  db.foddb.result(sqlDeleteUser, {userid: req.params.userid})
-    .then((result) => {
-      res.status(200)
-      .json({
-        meta: {
-          status: 'success',
-          message: 'Removed user: ' + req.params.userid
-        }
-      })
-    })
-    .catch((err) => {
-      console.error(err.stack)
-      return next(err.message)
-    })
-}
-
 const users = {
   authenticate: authenticate,
   auth: auth,
@@ -389,8 +373,7 @@ const users = {
   getOneUser: getOneUser,
   getUserNetworks: getUserNetworks,
   createUser: createUser,
-  updateUser: updateUser,
-  removeUser: removeUser
+  updateUser: updateUser
 }
 
 module.exports = users

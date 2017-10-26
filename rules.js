@@ -108,7 +108,30 @@ const getRuleDetail = (req, res, next) => {
 }
 
 const createRule = (req, res, next) => {
-  db.foddb.none('', req.body)
+  const sqlCreateRule = db.miniQuery('.sql/rules/insertRule.sql')
+  db.foddb.none(sqlCreateRule,
+    {
+      uuidrule: req.body.uuidrule,
+      rulename: req.body.uuidrule,
+      couuid: req.body.couuid,
+      uuiduser: req.body.uuiduser,
+      fromtime: req.body.fromtime,
+      totime: req.body.totime,
+      fnmid: req.body.fnmid,
+      dstip: req.body.dstip,
+      // srcip: req.body.srcip,
+      protocol: req.body.protocol,
+      dstport: req.body.dstport,
+      // srcport: req.body.srcport,
+      icmptype: req.body.icmptype,
+      icmpcode: req.body.icmpcode,
+      tcpflags: req.body.tcpflags,
+      pktlength: req.body.pktlength,
+      dscp: req.body.dscp,
+      fragenc: req.body.fragenc,
+      action: req.body.action,
+      description: req.body.description
+    })
     .then(() => {
       res.status(201)
       .json({

@@ -10,6 +10,8 @@ for customers
 */
 openRouter.get('/customers', customers.getAllCustomers)
 openRouter.get('/customers/:customerid', customers.getOneCustomer)
+openRouter.post('/customers', customers.createCustomer)
+openRouter.delete('/customers/:coid', customers.removeCustomer)
 openRouter.get('/customers/:customerid/relationships/networks', customers.getCustomerNetworks)
 openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
 openRouter.get('/networks', customers.getAllNetworks)
