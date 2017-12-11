@@ -9,7 +9,7 @@ const icmp = require('../icmp')
 map urls to functions
 for icmp types and codes
 */
-openRouter.get('/icmps', icmp.getIcmps)
+openRouter.get('/icmptypes', icmp.getIcmps)
 
 /*
 export express new openRouter object

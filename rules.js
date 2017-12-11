@@ -7,7 +7,7 @@ const getRules = (req, res, next) => {
   // const sqlRulesCount = db.miniQuery('.sql/rules/rulesCount.sql')
   let jsonarr = []
   let jsonobj = {}
-  let recs = 10
+  let records = 10
   let offset = 0 // rows to skip, same as # of recent rules to fetch
   let nxt = 0
   if (req.query.page !== undefined) {
@@ -16,7 +16,7 @@ const getRules = (req, res, next) => {
 
   db.foddb.tx(t => {
     let txs = []
-    const prRules = t.any(sqlGetAllRules, {rows: recs, next: offset + recs * nxt}).then(rules => {
+    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then(rules => {
       return rules
     })
     txs.push(prRules)
@@ -144,11 +144,34 @@ const createRule = (req, res, next) => {
     })
 }
 
+const updateRule = (req, res, next) => {
+  const sqlUpdateRule = db.miniQuery('.sql/rules/updateRule.sql')
+  db.foddb.any(sqlUpdateRule,
+    { ruleid: parseInt(req.params.ruleid),
+      isactive: req.body.isactive,
+      isexpired: req.body.isexpired
+    })
+    .then(() => {
+      res.status(200)
+      .json({
+        meta: {
+          status: 'success',
+          message: 'Rule ' + parseInt(req.params.ruleid) + ' cleared'
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack)
+      return next(err.message)
+    })
+}
+
 const rules = {
   getRules: getRules,
   getRuleById: getRuleById,
   getRuleDetail: getRuleDetail,
-  createRule: createRule
+  createRule: createRule,
+  updateRule: updateRule
 }
 
 module.exports = rules

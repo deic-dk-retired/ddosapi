@@ -1,6 +1,8 @@
+const fs = require('fs')
 const app = require('../app')
 const debug = require('debug')('node-postgres-promises:server')
 const http = require('http')
+// const https = require('https')
 
 /**
  * Normalize a port into a number, string, or false.
@@ -19,7 +21,7 @@ const normalizePort = (val) => {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener for HTTPS server "error" event.
  */
 const onError = (error) => {
   if (error.syscall !== 'listen') {
@@ -34,16 +36,18 @@ const onError = (error) => {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges')
       process.exit(1)
+      break
     case 'EADDRINUSE':
       console.error(bind + ' is already in use')
       process.exit(1)
+      break
     default:
       throw error
   }
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for HTTPS server "listening" event.
  */
 const onListening = () => {
   let addr = server.address()
@@ -61,9 +65,19 @@ const port = normalizePort(process.env.PORT || process.env.RU_SERVER_PORT)
 app.set('port', port)
 
 /**
- * Create HTTP server.
+ * Create HTTPS server.
  */
+// const options = {
+//   key: fs.readFileSync('noapi_key.pem'),
+//   cert: fs.readFileSync('noapi_cert.pem'),
+//   requestCert: true,
+//   rejectUnauthorized: true
+// }
 const server = http.Server(app)
+// const server = https.Server(options, app, (req, res) => {
+//   console.log('authorized: ', req.socket.authorized)
+//   console.log('client certificate: ', req.socket.getPeerCertificate())
+// })
 const io = require('socket.io')(server)
 /**
  * Listen on provided port, on all network interfaces.

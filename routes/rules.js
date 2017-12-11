@@ -14,6 +14,7 @@ openRouter.get('/rules', rules.getRules)
 openRouter.get('/rules/:id', rules.getRuleById)
 openRouter.get('/rules/detail/:prot/:dest/:action/:isexp/:isact/:vfrom/:vto', rules.getRuleDetail)
 openRouter.post('/rules', rules.createRule)
+openRouter.patch('/rules/:ruleid', rules.updateRule)
 
 /*
 export express new openRouter object

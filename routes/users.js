@@ -9,8 +9,8 @@ const users = require('../users')
 map urls to functions
 for users
 */
-openRouter.post('/authenticate', users.authenticate)
-openRouter.get('/login', users.auth)
+// openRouter.post('/authenticate', users.authenticate)
+openRouter.post('/login', users.auth)
 openRouter.get('/users', users.getAllUsers)
 openRouter.get('/users/:userid', users.getOneUser)
 openRouter.get('/users/:userid/relationships/networks', users.getUserNetworks)
