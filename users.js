@@ -308,15 +308,41 @@ const getUserNetworks = (req, res, next) => {
 }
 
 const updateUser = (req, res, next) => {
-  const sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
-  const sqlUpdateUserNetworks = db.miniQuery('.sql/users/updateUserNetworks.sql')
+  let sqlUpdateUser = 'UPDATE flow.administrators SET '
+  let netarr = ''
 
-  // insert into networkrights for each id
+  if (req.body.couuid !== '') {
+    sqlUpdateUser += 'uuid_customerid = $(couuid), customerid = $(coid), '
+  }
+
+  if (req.body.kind !== '') {
+    sqlUpdateUser += 'kind = $(kind), '
+  }
+
+  if (req.body.netids !== null) {
+    netarr = '{' + req.body.netids.join() + '}'
+    sqlUpdateUser += 'networks = $(netids), '
+  }
+
+  if (req.body.valid !== '') {
+    sqlUpdateUser += 'valid = $(valid), '
+  }
+
+  sqlUpdateUser = sqlUpdateUser.substr(0, sqlUpdateUser.length - 2)
+
+  if (req.body.useruuid !== '') {
+    sqlUpdateUser += ' WHERE uuid_administratorid = $(useruuid) RETURNING *; COMMIT;'
+  }
+
+  console.log(sqlUpdateUser)
+//   uuid_customerid = $(couuid)
+// , customerid=$(coid)
 
   db.foddb.any(sqlUpdateUser,
     { couuid: req.body.couuid,
       coid: parseInt(req.body.coid),
       kind: req.body.kind,
+      netids: netarr,
       useruuid: req.body.useruuid,
       valid: req.body.valid,
       userid: parseInt(req.params.userid)
@@ -367,7 +393,6 @@ const createUser = (req, res, next) => {
 }
 
 const users = {
-  authenticate: authenticate,
   auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
