@@ -1,17 +1,16 @@
 // connect to db and then get the
 // query handler method
-var db = require('./db')
+const db = require('./db')
 
-function getIcmps (req, res, next) {
-  var allTypesIcmp = db.miniQuery('.sql/misc/allTnCicmps.sql')
+const getIcmps = (req, res, next) => {
+  var allTypesIcmp = db.miniQuery('.sql/misc/allTypesIcmp.sql')
   db.foddb.any(allTypesIcmp)
     .then(function (data) {
-      // json api
       res.status(200)
       .json({
         data: data.map(function (e) {
           return {
-            type: 'icmps',
+            type: 'icmptype',
             id: e.id,
             attributes: {
               name: e.name,
@@ -30,6 +29,8 @@ function getIcmps (req, res, next) {
     })
 }
 
-module.exports = {
+const icmp = {
   getIcmps: getIcmps
 }
+
+module.exports = icmp

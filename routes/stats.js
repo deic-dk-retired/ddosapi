@@ -1,15 +1,16 @@
 const express = require('express')
 const openRouter = express.Router()
 
-const icmp = require('../icmp')
+const rules = require('../stats')
 
 // openRouter.get('/')
 
 /*
 map urls to functions
-for icmp types and codes
+for rules
 */
-openRouter.get('/icmptypes', icmp.getIcmps)
+// openRouter.get('/api/rules/:rows/:offset', rules.getRules)
+openRouter.get('/stats/:userid', rules.getStats)
 
 /*
 export express new openRouter object

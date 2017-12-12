@@ -308,15 +308,43 @@ const getUserNetworks = (req, res, next) => {
 }
 
 const updateUser = (req, res, next) => {
-  const sqlUpdateUser = db.miniQuery('.sql/users/updateUser.sql')
+  let sqlUpdateUser = 'UPDATE flow.administrators SET '
+  let netarr = ''
+
+  if (req.body.couuid !== '') {
+    sqlUpdateUser += 'uuid_customerid = $(couuid), customerid = $(coid), '
+  }
+
+  if (req.body.kind !== '') {
+    sqlUpdateUser += 'kind = $(kind), '
+  }
+
+  if (req.body.netids !== null) {
+    netarr = '{' + req.body.netids.join() + '}'
+    sqlUpdateUser += 'networks = $(netids), '
+  }
+
+  if (req.body.valid !== '') {
+    sqlUpdateUser += 'valid = $(valid), '
+  }
+
+  sqlUpdateUser = sqlUpdateUser.substr(0, sqlUpdateUser.length - 2)
+
+  if (req.body.useruuid !== '') {
+    sqlUpdateUser += ' WHERE uuid_administratorid = $(useruuid) RETURNING *; COMMIT;'
+  }
+
+  console.log(sqlUpdateUser)
+//   uuid_customerid = $(couuid)
+// , customerid=$(coid)
+
   db.foddb.any(sqlUpdateUser,
-    { customerid: parseInt(req.body.customerid),
+    { couuid: req.body.couuid,
+      coid: parseInt(req.body.coid),
       kind: req.body.kind,
-      name: req.body.name,
-      phone: req.body.phone,
-      email: req.body.email,
-      username: req.body.username,
-      password: req.body.password,
+      netids: netarr,
+      useruuid: req.body.useruuid,
+      valid: req.body.valid,
       userid: parseInt(req.params.userid)
     })
     .then(() => {
@@ -324,7 +352,7 @@ const updateUser = (req, res, next) => {
       .json({
         meta: {
           status: 'success',
-          message: 'User ' + req.body.username + ' modified'
+          message: 'User ' + req.params.userid + ' modified'
         }
       })
     })
@@ -364,33 +392,13 @@ const createUser = (req, res, next) => {
     })
 }
 
-const removeUser = (req, res, next) => {
-  const sqlDeleteUser = db.miniQuery('.sql/users/deleteUser.sql')
-  db.foddb.result(sqlDeleteUser, {username: req.params.username})
-    .then((result) => {
-      res.status(200)
-      .json({
-        meta: {
-          status: 'success',
-          message: 'Removed user: ' + req.params.username
-        }
-      })
-    })
-    .catch((err) => {
-      console.error(err.stack)
-      return next(err.message)
-    })
-}
-
 const users = {
-  authenticate: authenticate,
   auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
   getUserNetworks: getUserNetworks,
   createUser: createUser,
-  updateUser: updateUser,
-  removeUser: removeUser
+  updateUser: updateUser
 }
 
 module.exports = users

@@ -1,14 +1,14 @@
-const db = require('./db')
-const url = 'http://10.33.1.97:4242/api/customers/'
+  const db = require('./db')
+  const courl = 'http://10.33.1.97:4242/api/customers/'
+  const neturl = 'http://10.33.1.97:4242/api/networks/'
 
-// uses json api conventions
-const getAllCustomers = (req, res, next) => {
+  const getAllCustomers = (req, res, next) => {
   /*
   #todo: get customer and customer networks
   #todo: sideload relations
   */
-  const sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
-  db.foddb.any(sqlAllCustomers)
+    const sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
+    db.foddb.any(sqlAllCustomers)
     .then(function (data) {
       // create json api array
       var jsonarr = []
@@ -16,18 +16,20 @@ const getAllCustomers = (req, res, next) => {
       data.map(function (e) {
         jsonobj = {
           type: 'customers',
-          id: parseInt(e.customerid)
+          id: parseInt(e.customerid),
+          links: {
+            self: courl + e.customerid
+          }
         }
-        // remove duplicate id property from attributes
         delete e.customerid
         jsonobj.attributes = e
         jsonarr.push(jsonobj)
       })
-      // show jsonapi
       res.status(200)
       .json({
         data: jsonarr,
         meta: {
+          status: 'OK',
           total: data.length
         }
       })
@@ -36,28 +38,27 @@ const getAllCustomers = (req, res, next) => {
       console.error(err.stack)
       return next(err.message)
     })
-}
+  }
 
-// uses json api conventions
-// // return all networks of all customers
-const getAllNetworks = (req, res, next) => {
-  const sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
-  db.foddb.any(sqlallNetworks)
+// return all networks of all customers
+  const getAllNetworks = (req, res, next) => {
+    const sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
+    db.foddb.any(sqlallNetworks)
     .then(function (data) {
-      // create json api array
       var jsonarr = []
       var jsonobj
       data.map(function (e) {
         jsonobj = {
           type: 'networks',
-          id: parseInt(e.customernetworkid)
+          id: parseInt(e.customernetworkid),
+          links: {
+            self: neturl + e.customernetworkid
+          }
         }
-        // remove duplicate id property from attributes
         delete e.customernetworkid
         jsonobj.attributes = e
         jsonarr.push(jsonobj)
       })
-      // show jsonapi
       res.status(200)
       .json({
         data: jsonarr,
@@ -70,32 +71,32 @@ const getAllNetworks = (req, res, next) => {
       console.error(err.stack)
       return next(err.message)
     })
-}
+  }
 
-// uses json api conventions
 // return all networks of a customer based on customerid
-const getCustomerNetworks = (req, res, next) => {
-  const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
-  db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
+  const getCustomerNetworks = (req, res, next) => {
+    const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
+    db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
     .then(function (data) {
-      // create json api array
       var jsonarr = []
       var jsonobj
       data.map(function (e) {
         jsonobj = {
           type: 'networks',
-          id: parseInt(e.customernetworkid)
+          id: parseInt(e.customernetworkid),
+          links: {
+            self: neturl + e.customernetworkid
+          }
         }
-        // remove duplicate id property from attributes
         delete e.customernetworkid
         jsonobj.attributes = e
         jsonarr.push(jsonobj)
       })
-      // show jsonapi
       res.status(200)
       .json({
         data: jsonarr,
         meta: {
+          status: 'OK',
           total: data.length
         }
       })
@@ -104,24 +105,27 @@ const getCustomerNetworks = (req, res, next) => {
       console.error(err.stack)
       return next(err.message)
     })
-}
+  }
 
 // uses json api conventions
-const getOneCustomer = (req, res, next) => {
+  const getOneCustomer = (req, res, next) => {
   /*
   #todo: get customer and customer networks
   #todo: sideload relations
   */
-  const sqlOneCustomer = db.miniQuery('.sql/customers/oneCustomer.sql')
-  db.foddb.one(sqlOneCustomer, {customerid: req.params.customerid})
-    .then(function (data) {
+    const sqlOneCustomer = db.miniQuery('.sql/customers/oneCustomer.sql')
+    db.foddb.one(sqlOneCustomer, {customerid: req.params.customerid})
+    .then((d) => {
       var jsonobj = {
         type: 'customers',
-        id: parseInt(data.customerid)
+        id: parseInt(d.customerid),
+        links: {
+          self: courl + d.customerid
+        }
       }
       // remove duplicate id property from attributes
-      delete data.customerid
-      jsonobj.attributes = data
+      delete d.customerid
+      jsonobj.attributes = d
       // show jsonapi
       res.status(200)
       .json({
@@ -132,43 +136,131 @@ const getOneCustomer = (req, res, next) => {
       console.error(err.stack)
       return next(err.message)
     })
-}
+  }
 
-const createCustomer = (req, res, next) => {
-  // add customer info
+  const createCustomer = (req, res, next) => {
   // add customer networks
+    const sqlCreateCustomer = db.miniQuery('.sql/customers/createCustomer.sql')
+    db.foddb.tx(t => {
+      return t.one(sqlCreateCustomer, {
+        couuid: req.params.couuid,
+        coname: req.params.coname,
+        coadd1: req.params.coadd1,
+        coadd2: req.params.coadd2,
+        coadd3: req.params.coadd3,
+        coaccname: req.params.oaccname,
+        coaccemail: req.params.coaccemail,
+        coaccphone: req.params.coaccphone,
+        coaccrate: req.params.coaccrate,
+        subfee: req.params.subfee,
+        discount: req.params.discount,
+        coemail: req.params.coemail,
+        cophopne: req.params.cophopne,
+        coweb: req.params.coweb,
+        cocvr: req.params.cocvr,
+        coean: req.params.coean,
+        coadd4: req.params.coadd4,
+        codesc: req.params.ccodesc
+      })
+    })
+  .then(d => {
+    console.log(d)
+    var jsonobj
+    jsonobj = {
+      type: 'customers',
+      id: parseInt(d.customerid)
+    }
+    delete d.customerid
+    jsonobj.attributes = d
+    res.status(201)
+      .json({
+        data: jsonobj,
+        meta: {
+          status: 'Created',
+          message: 'Successfully created customer ' + jsonobj.attributes.name
+        }
+      })
+  })
+  .catch(err => {
+    console.error(err.stack)
+    return next(err.message)
+  })
+  }
 
-}
-
-const updateCustomer = (req, res, next) => {
+  const updateCustomer = (req, res, next) => {
   // update customer info
   // update customer networks
-}
+  }
 
-const removeCustomer = (req, res, next) => {
-  // delete customer info
-  // delete customer networks
-}
-
-const createNetwork = (req, res, next) => {
-  const sqlCreateNetwork = db.miniQuery('.sql/customers/sqlCreateNetwork.sql')
-  db.foddb.none(sqlCreateNetwork,
-    { customerid: parseInt(req.body.customerid),
-      name: req.body.name,
-      kind: req.body.kind,
-      net: req.body.net,
-      description: req.body.desc
+  const removeCustomer = (req, res, next) => {
+    const sqlHasNetworks = db.miniQuery('.sql/customers/hasNetworks.sql')
+    const sqlIsCustomer = db.miniQuery('.sql/customers/isCustomer.sql')
+    const sqlDeleteCo = db.miniQuery('.sql/customers/deleteCustomer.sql')
+    const sqlDeleteCoNetworks = db.miniQuery('.sql/customers/deleteNetwork.sql')
+    db.foddb.tx(t => {
+      let txs = []
+      const isCo = t.any(sqlIsCustomer, {customerid: req.params.coid}).then(e => {
+        return e
+      })
+      if (isCo) {
+        // find its networks
+          // delete those networks
+        // delete co
+        const isNet = t.any(sqlHasNetworks, {customerid: req.params.coid}).then(e => {
+          return e
+        })
+        if (isNet) {
+          t.none()
+        }
+      }
+      // return t.batch([hasNets, isCo])
     })
-    .then(() => {
+    .catch(err => {
+      console.error(err.stack)
+      return next(err.message)
+    })
+
+  // db.foddb.result(sqlDeleteCo, {coid: req.params.coid})
+  //   .then((result) => {
+  //     res.status(200)
+  //     .json({
+  //       meta: {
+  //         status: 'OK',
+  //         message: 'Removed customer: ' + req.params.coid
+  //       }
+  //     })
+  //   })
+  //   .catch((err) => {
+  //     console.error(err.stack)
+  //     return next(err.message)
+  //   })
+  }
+
+  const createNetwork = (req, res, next) => {
+    const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
+    db.foddb.one(sqlCreateNetwork,
+      { netuuid: req.body.netuuid,
+        couuid: req.body.couuid,
+        coid: parseInt(req.body.coid),
+        netname: req.body.netname,
+        netkind: req.body.netkind,
+        netaddr: req.body.netaddr,
+        netdesc: req.body.netdesc
+      })
+    .then((d) => {
+      var jsonobj
+      jsonobj = {
+        type: 'networks',
+        id: parseInt(d.customernetworkid)
+      }
+      delete d.customernetworkid
+      jsonobj.attributes = d
       res.status(201)
       .json({
+        data: jsonobj,
         meta: {
-          status: 'successfully created network',
-          message: {
-            name: req.body.name,
-            kind: req.body.kind,
-            net: req.body.net
-          }
+          status: 'OK',
+          message: 'Successfully created network ' + jsonobj.attributes.name
         }
       })
     })
@@ -176,17 +268,36 @@ const createNetwork = (req, res, next) => {
       console.error(err.stack)
       return next(err.message)
     })
-}
+  }
 
-const customers = {
-  getAllCustomers: getAllCustomers,
-  getAllNetworks: getAllNetworks,
-  getCustomerNetworks: getCustomerNetworks,
-  getOneCustomer: getOneCustomer,
-  createCustomer: createCustomer,
-  updateCustomer: updateCustomer,
-  removeCustomer: removeCustomer,
-  createNetwork: createNetwork
-}
+  const removeNetwork = (req, res, next) => {
+    const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteCustomerNetwork.sql')
+    db.foddb.none(sqlRemoveNetwork, {netid: parseInt(req.params.netid)})
+    .then(() => {
+      res.status(200)
+      .json({
+        meta: {
+          status: 'OK',
+          status: 'successfully removed network'
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack)
+      return next(err.message)
+    })
+  }
 
-module.exports = customers
+  const customers = {
+    getAllCustomers: getAllCustomers,
+    getAllNetworks: getAllNetworks,
+    getCustomerNetworks: getCustomerNetworks,
+    getOneCustomer: getOneCustomer,
+    createCustomer: createCustomer,
+    updateCustomer: updateCustomer,
+    removeCustomer: removeCustomer,
+    createNetwork: createNetwork,
+    removeNetwork: removeNetwork
+  }
+
+  module.exports = customers

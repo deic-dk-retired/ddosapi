@@ -3,9 +3,9 @@
  *    Expose tis function to be used in router.
  * 2. Build dynamic influx queries using influxdb-nodejs api
  */
-var db = require('./db')
+const db = require('./db')
 /* uses default influx and pull from static query file from given url param */
-function getSeries (req, res, next) {
+const getSeries = (req, res, next) => {
   var qryfile = req.params.qryfile + '.sql'
   /**
    * store minified queryfile object into a variable
@@ -13,12 +13,12 @@ function getSeries (req, res, next) {
    */
   var getAllSeries = db.miniQuery('.influxql/' + qryfile)
   db.influxClient.query(getAllSeries.query)
-    .then(function (data) {
+    .then(function (d) {
       res.status(200)
       .json({
-        stamp: data,
+        series: d,
         meta: {
-          total: data.length
+          total: d.length
         }
       })
     })
@@ -27,7 +27,7 @@ function getSeries (req, res, next) {
     })
 }
 
-function getSeriesWithTime (req, res, next) {
+const getSeriesWithTime = (req, res, next) => {
   var qryfile = req.params.qryfile + '.sql'
   // var topn = parseInt(req.params.num)
   var getAllSeries = db.miniQuery('.influxql/' + qryfile)
@@ -89,8 +89,10 @@ function getSeriesWithTime (req, res, next) {
 //   })
 // }
 
-module.exports = {
+const fnm = {
   getSeries: getSeries,
   getSeriesWithTime: getSeriesWithTime
   // getOneSeries: getOneSeries
 }
+
+module.exports = fnm
