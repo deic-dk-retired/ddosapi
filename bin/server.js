@@ -1,4 +1,4 @@
-const fs = require('fs')
+// const fs = require('fs')
 const app = require('../app')
 const debug = require('debug')('node-postgres-promises:server')
 const http = require('http')
@@ -36,11 +36,11 @@ const onError = (error) => {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges')
       process.exit(1)
-      break
+      // break
     case 'EADDRINUSE':
       console.error(bind + ' is already in use')
       process.exit(1)
-      break
+      // break
     default:
       throw error
   }
