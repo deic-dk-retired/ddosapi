@@ -1,38 +1,6 @@
 const db = require('./db')
 const url = 'http://10.33.1.97:4242/api/users/'
 
-const authenticate = (req, res, next) => {
-  const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
-  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
-    .then((data) => {
-      res.status(200)
-        .json({
-          type: 'users',
-          id: parseInt(data.id),
-          attributes: data
-        })
-    })
-    .catch((err) => {
-      return next(err.message)
-    })
-}
-
-const auth = (req, res, next) => {
-  const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
-  db.foddb.any(sqlUserAccess, {username: req.params.username, password: req.params.password})
-    .then((data) => {
-      res.status(200)
-        .json({
-          type: 'users',
-          id: data.id,
-          attributes: data
-        })
-    })
-    .catch((err) => {
-      return next(err.message)
-    })
-}
-
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
   const sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
@@ -393,7 +361,8 @@ const createUser = (req, res, next) => {
 }
 
 const users = {
-  auth: auth,
+  // jwt: jwt,
+  // auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
   getUserNetworks: getUserNetworks,
