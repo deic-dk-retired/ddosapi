@@ -7,11 +7,6 @@ const auth = (req, res, next) => {
   const verUsername = db.miniQuery('.sql/users/isUser.sql')
   const verActiveUser = db.miniQuery('.sql/users/userStatus.sql')
 
-  // console.log(sqlUserAccess)
-  // console.log(verUsername)
-  // console.log(verActiveUser)
-  // console.log(req.body.verUsername)
-
   db.foddb.any(verUsername, {username: req.body.username})
   .then((d) => {
     if (d.length === 0) { //! user
@@ -35,9 +30,9 @@ const auth = (req, res, next) => {
                 co: d.companyname
               }
               let token = jwt.sign(payload, process.env.SU_SEC, {
-                expiresIn: '6h', // expires in 6 hours,
+                expiresIn: '6h',
                 algorithm: 'HS512',
-                issuer: 'Ashokaditya, DeIC'
+                issuer: process.env.SU_ISSUER
               })
               res.status(200)
               .json({
@@ -77,29 +72,6 @@ const auth = (req, res, next) => {
   .catch((err) => {
     return next(err.message)
   })
-
-  // db.foddb.any(sqlUserAccess, {username: req.body.username, password: req.body.password})
-  //   .then((d) => {
-  //     let payload = {
-  //       ddpsEng: 'fastnetmon',
-  //       clnt: 'deic-ddps',
-  //       usrtype: d.kind,
-  //       co: d.companyname
-  //     }
-  //     let token = jwt.sign(payload, process.env.SU_SEC, {
-  //       expiresIn: '6h', // expires in 6 hours,
-  //       algorithm: 'HS512',
-  //       issuer: 'Ashokaditya, DeIC'
-  //     })
-  //     res.status(200)
-  //     .json({
-  //       type: 'auth',
-  //       token: token
-  //     })
-  //   })
-  //   .catch((err) => {
-  //     return next(err.message)
-  //   })
 }
 
 const users = {
