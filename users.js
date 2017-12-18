@@ -1,34 +1,5 @@
-require('dotenv').config()
 const db = require('./db')
-const jwt = require('jsonwebtoken')
 const url = 'http://10.33.1.97:4242/api/users/'
-
-const auth = (req, res, next) => {
-  const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
-  // const verUsername = 'SELECT '
-  db.foddb.any(sqlUserAccess, {username: req.body.username, password: req.body.password})
-    .then((d) => {
-      let payload = {
-        ddpsEng: 'fastnetmon',
-        clnt: 'deic-ddps',
-        usrtype: d.kind,
-        co: d.companyname
-      }
-      let token = jwt.sign(payload, process.env.SU_SEC, {
-        expiresIn: '24h', // expires in 24 hours,
-        algorithm: 'HS512',
-        issuer: 'Ashokaditya, DeIC'
-      })
-      res.status(200)
-      .json({
-        type: 'auth',
-        token: token
-      })
-    })
-    .catch((err) => {
-      return next(err.message)
-    })
-}
 
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
@@ -390,8 +361,8 @@ const createUser = (req, res, next) => {
 }
 
 const users = {
-  jwt: jwt,
-  auth: auth,
+  // jwt: jwt,
+  // auth: auth,
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
   getUserNetworks: getUserNetworks,
