@@ -2,7 +2,7 @@ require('dotenv').config()
 const db = require('./db')
 const jwt = require('jsonwebtoken')
 
-const auth = (req, res, next) => {
+const authenticate = (req, res, next) => {
   const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   const verUsername = db.miniQuery('.sql/users/isUser.sql')
   const verActiveUser = db.miniQuery('.sql/users/userStatus.sql')
@@ -18,29 +18,36 @@ const auth = (req, res, next) => {
     } else { // isUser
       return db.foddb.any(verActiveUser, {username: d[0].username})
       .then((d) => {
-        console.log(d[0].valid)
         if (d[0].valid === 'active') { // isActive
           return db.foddb.any(sqlUserAccess, {username: req.body.username, password: req.body.password})
           .then((d) => { // password matches
             if (d[0].hasAccess) {
               let payload = {
                 ddpsEng: 'fastnetmon',
-                clnt: 'deic-ddps',
-                usrtype: d.kind,
-                co: d.companyname
+                clnt: req.hostname + '/' + req.ip,
+                userid: d[0].administratorid,
+                useruuid: d[0].uuid_administratorid,
+                username: d[0].username,
+                usrtype: d[0].kind,
+                co: d[0].companyname
               }
               let token = jwt.sign(payload, process.env.SU_SEC, {
-                expiresIn: '6h',
+                expiresIn: '1h',
                 algorithm: 'HS512',
                 issuer: process.env.SU_ISSUER
               })
+              delete payload.ddpsEng
+              delete payload.userid
+              // delete payload.clnt
+              delete payload.co
               res.status(200)
               .json({
                 type: 'auth',
-                token: token,
+                jwt: token,
                 data: [{
                   type: 'users',
                   id: d[0].administratorid,
+                  attributes: payload,
                   links: {
                     self: '/api/users/' + d[0].administratorid
                   }
@@ -74,8 +81,8 @@ const auth = (req, res, next) => {
   })
 }
 
-const users = {
-  auth: auth
+const auth = {
+  authenticate: authenticate
 }
 
-module.exports = users
+module.exports = auth

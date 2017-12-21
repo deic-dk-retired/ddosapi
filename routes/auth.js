@@ -12,15 +12,21 @@ map urls to functions
 for users
 */
 // openRouter.post('/authenticate', users.authenticate)
-openRouter.post('/auth', auth.auth)
+openRouter.post('/auth', auth.authenticate)
 openRouter.use((req, res, next) => {
-  var token = req.body.token || req.param('token') || req.headers['x-access-token']
+  let token = req.headers.jauthtkn || req.headers['x-access-token']
+  if (req.method === 'OPTIONS') {
+    return res.status(200).send({
+      success: false,
+      message: 'Preflight check. Done!'
+    })
+  }
   if (token) {
     jwt.verify(token, process.env.SU_SEC, function (err, decoded) {
       if (err) {
         return res.json({
           success: false,
-          message: 'Failed to authenticate token.'
+          message: 'Invalid token. Failed to authenticate!'
         })
       } else {
         req.decoded = decoded
