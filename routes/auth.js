@@ -14,7 +14,7 @@ for users
 // openRouter.post('/authenticate', users.authenticate)
 openRouter.post('/auth', auth.authenticate)
 openRouter.use((req, res, next) => {
-  let token = req.headers.jauthtkn || req.headers['x-access-token']
+  let token = req.headers.jwtauthtkn || req.headers['x-jwt-tkn']
   if (req.method === 'OPTIONS') {
     return res.status(200).send({
       success: false,

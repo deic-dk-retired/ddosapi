@@ -24,10 +24,11 @@ const authenticate = (req, res, next) => {
             if (d[0].hasAccess) {
               let payload = {
                 ddpsEng: 'fastnetmon',
-                clnt: req.hostname + '/' + req.ip,
+                clnt: req.ip,
                 userid: d[0].administratorid,
                 useruuid: d[0].uuid_administratorid,
                 username: d[0].username,
+                useralias: d[0].name,
                 usrtype: d[0].kind,
                 co: d[0].companyname
               }
@@ -38,7 +39,6 @@ const authenticate = (req, res, next) => {
               })
               delete payload.ddpsEng
               delete payload.userid
-              // delete payload.clnt
               delete payload.co
               res.status(200)
               .json({
