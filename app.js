@@ -23,7 +23,7 @@ const app = express()
 app.use(helmet())
 app.use(compression())
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, jwtauthtkn')
   res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
   res.header('Access-Control-Allow-Origin', req.headers.origin)
   res.header('Content-Type', 'application/vnd.api+json')
@@ -45,13 +45,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', index)
 app.use('/api', auth)
-app.use('/api', stats)
-app.use('/api', users)
-app.use('/api', rules)
 app.use('/api', customers)
-app.use('/api', tcps)
-app.use('/api', icmps)
 app.use('/api', fnm)
+app.use('/api', icmps)
+app.use('/api', rules)
+app.use('/api', stats)
+app.use('/api', tcps)
+app.use('/api', users)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
