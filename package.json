@@ -10,7 +10,6 @@
   "author": "Ashokaditya",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^1.0.3",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "chalk": "^2.3.0",
