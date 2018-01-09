@@ -20,7 +20,15 @@ const stats = require('./routes/stats')
 const app = express()
 
 // app.disable('x-powered-by')
-app.use(helmet())
+// app.use(helmet())
+app.use(helmet.dnsPrefetchControl())
+app.use(helmet.frameguard())
+app.use(helmet.hidePoweredBy())
+app.use(helmet.noCache())
+app.use(helmet.noSniff())
+app.use(helmet.referrerPolicy())
+app.use(helmet.xssFilter())
+
 app.use(compression())
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, jwtauthtkn')

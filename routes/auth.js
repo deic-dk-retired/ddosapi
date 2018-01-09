@@ -16,7 +16,8 @@ openRouter.post('/auth', auth.authenticate)
 openRouter.use((req, res, next) => {
   let token = req.headers.jwtauthtkn || req.headers['x-jwt-tkn']
   if (req.method === 'OPTIONS') {
-    return res.status(200).send({
+    return res.status(200).json({
+      status: 200,
       success: false,
       message: 'Preflight check. Done!'
     })
@@ -24,7 +25,8 @@ openRouter.use((req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.SU_SEC, function (err, decoded) {
       if (err) {
-        return res.json({
+        return res.status(404).json({
+          status: 404,
           success: false,
           message: 'Invalid token. Failed to authenticate!'
         })
@@ -34,7 +36,7 @@ openRouter.use((req, res, next) => {
       }
     })
   } else {
-    return res.status(403).send({
+    return res.status(403).json({
       success: false,
       message: 'No token provided.'
     })
