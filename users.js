@@ -302,7 +302,7 @@ const updateUser = (req, res, next) => {
     sqlUpdateUser += ' WHERE uuid_administratorid = $(useruuid) RETURNING *; COMMIT;'
   }
 
-  console.log(sqlUpdateUser)
+  // console.log(sqlUpdateUser)
 //   uuid_customerid = $(couuid)
 // , customerid=$(coid)
 

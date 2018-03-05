@@ -9,6 +9,7 @@ const fnm = require('../fnm')
 map urls to functions
 for time series data
 */
+openRouter.get('/fnms', fnm.getFnms)
 openRouter.get('/series/:qryfile', fnm.getSeries)
 // openRouter.get('/api/series/raw', fnm.getSeriesWithTime)
 // openRouter.get('/api/series/raw/:qryfile/:top', fnm.getSeriesWithTime)

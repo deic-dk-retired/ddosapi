@@ -4,6 +4,33 @@
  * 2. Build dynamic influx queries using influxdb-nodejs api
  */
 const db = require('./db')
+
+const getFnms = (req, res, next) => {
+  var sqlFnm = db.miniQuery('.sql/misc/allFnm.sql')
+  db.foddb.any(sqlFnm)
+    .then((d) => {
+      res.status(200)
+      .json({
+        data: d.map(function (e) {
+          return {
+            type: 'fnms',
+            id: e.id,
+            attributes: {
+              fnmid: e.fnmid,
+              couuid: e.couuid,
+              coid: e.coid
+            }
+          }
+        }),
+        meta: {
+          total: d.length
+        }
+      })
+    })
+    .catch((err) => {
+      return next(err.message)
+    })
+}
 /* uses default influx and pull from static query file from given url param */
 const getSeries = (req, res, next) => {
   var qryfile = req.params.qryfile + '.sql'
@@ -91,7 +118,8 @@ const getSeriesWithTime = (req, res, next) => {
 
 const fnm = {
   getSeries: getSeries,
-  getSeriesWithTime: getSeriesWithTime
+  getSeriesWithTime: getSeriesWithTime,
+  getFnms: getFnms
   // getOneSeries: getOneSeries
 }
 
