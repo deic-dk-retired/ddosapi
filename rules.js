@@ -108,35 +108,43 @@ const getRuleDetail = (req, res, next) => {
 }
 
 const createRule = (req, res, next) => {
-  const sqlCreateRule = db.miniQuery('.sql/rules/insertRule.sql')
-  db.foddb.none(sqlCreateRule,
+  const sqlCreateRule = db.miniQuery('.sql/rules/createRule.sql')
+  db.foddb.any(sqlCreateRule,
     {
-      uuidrule: req.body.uuidrule,
-      rulename: req.body.uuidrule,
+      ruleuuid: req.body.ruleuuid,
+      rulename: req.body.ruleuuid,
       couuid: req.body.couuid,
-      uuiduser: req.body.uuiduser,
-      fromtime: req.body.fromtime,
-      totime: req.body.totime,
-      fnmid: req.body.fnmid,
-      dstip: req.body.dstip,
-      // srcip: req.body.srcip,
+      useruuid: req.body.useruuid,
+      fmnuuid: req.body.fmnuuid,
+      validfrom: req.body.validfrom,
+      validto: req.body.validto,
+      destip: req.body.destip,
+      destport: req.body.destport,
       protocol: req.body.protocol,
-      dstport: req.body.dstport,
-      // srcport: req.body.srcport,
       icmptype: req.body.icmptype,
       icmpcode: req.body.icmpcode,
       tcpflags: req.body.tcpflags,
-      pktlength: req.body.pktlength,
-      dscp: req.body.dscp,
+      pktlen: req.body.pktlen,
       fragenc: req.body.fragenc,
-      action: req.body.action,
-      description: req.body.description
+      description: req.body.description,
+      action: req.body.action
     })
-    .then(() => {
+    .then((d) => {
+      var jsonobj
+      jsonobj = {
+        type: 'rules',
+        id: parseInt(d[0].flowspecruleid)
+      }
+      delete d[0].flowspecruleid
+      jsonobj.attributes = d.pop()
+      console.log(jsonobj)
       res.status(201)
       .json({
-        status: 'success',
-        message: 'Inserted one rule'
+        data: jsonobj,
+        meta: {
+          status: 'OK',
+          message: 'Successfully created a ' + jsonobj.attributes.ipprotocol + ' rule on ' + jsonobj.attributes.destinationprefix
+        }
       })
     })
     .catch((err) => {
