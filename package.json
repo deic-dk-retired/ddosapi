@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/server",
     "watch": "nodemon ./bin/server",
-    "test": "snyk test"
+    "test": "npm test"
   },
   "author": "Ashokaditya",
   "license": "ISC",
@@ -41,7 +41,6 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "nodemon": "^1.12.1",
-    "snyk": "^1.52.1"
+    "nodemon": "^1.12.1"
   }
 }
