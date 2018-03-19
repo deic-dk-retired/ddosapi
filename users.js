@@ -124,7 +124,7 @@ const getAllUsers = (req, res, next) => {
     }
   })
   .catch((err) => {
-    console.error(err.stack)
+    console.log(err.stack)
     return next(err.message)
   })
 }
@@ -226,7 +226,7 @@ const getOneUser = (req, res, next) => {
     }
   })
   .catch((err) => {
-    console.error(err.stack)
+    console.log(err.stack)
     return next(err.message)
   })
 }
@@ -270,7 +270,7 @@ const getUserNetworks = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
@@ -325,7 +325,7 @@ const updateUser = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
@@ -355,7 +355,7 @@ const createUser = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
