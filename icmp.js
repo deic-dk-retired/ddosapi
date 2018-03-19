@@ -30,7 +30,7 @@ const getIcmps = (req, res, next) => {
 }
 
 const icmp = {
-  getIcmps: getIcmps
+  getIcmps
 }
 
 module.exports = icmp

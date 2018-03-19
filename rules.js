@@ -175,11 +175,11 @@ const updateRule = (req, res, next) => {
 }
 
 const rules = {
-  getRules: getRules,
-  getRuleById: getRuleById,
-  getRuleDetail: getRuleDetail,
-  createRule: createRule,
-  updateRule: updateRule
+  getRules,
+  getRuleById,
+  getRuleDetail,
+  createRule,
+  updateRule
 }
 
 module.exports = rules

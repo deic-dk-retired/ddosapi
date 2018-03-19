@@ -6,7 +6,7 @@ const getStats = (req, res, next) => {
     .then((data) => {
       res.status(200)
       .json({
-        data: data
+        data
       })
     })
     .catch((err) => {
@@ -15,7 +15,7 @@ const getStats = (req, res, next) => {
 }
 
 const stats = {
-  getStats: getStats
+  getStats
 }
 
 module.exports = stats

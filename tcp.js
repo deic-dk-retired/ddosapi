@@ -30,5 +30,5 @@ const getTcps = (req, res, next) => {
 }
 
 module.exports = {
-  getTcps: getTcps
+  getTcps
 }

@@ -91,7 +91,7 @@ const authenticate = (req, res, next) => {
 }
 
 const auth = {
-  authenticate: authenticate
+  authenticate
 }
 
 module.exports = auth

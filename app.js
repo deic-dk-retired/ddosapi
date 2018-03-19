@@ -72,10 +72,9 @@ app.use(function (req, res, next) {
   delete req.session.success
   delete req.session.notice
 
-  if (err) res.locals.error = err
-  if (msg) res.locals.notice = msg
-  if (success) res.locals.success = success
-
+  if (err) { res.locals.error = err }
+  if (msg) { res.locals.notice = msg }
+  if (success) { res.locals.success = success }
   next()
 })
 

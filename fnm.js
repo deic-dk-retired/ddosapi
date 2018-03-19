@@ -117,10 +117,10 @@ const getSeriesWithTime = (req, res, next) => {
 // }
 
 const fnm = {
-  getSeries: getSeries,
-  getSeriesWithTime: getSeriesWithTime,
-  getFnms: getFnms
-  // getOneSeries: getOneSeries
+  getSeries,
+  getSeriesWithTime,
+  getFnms
+  // getOneSeries
 }
 
 module.exports = fnm
