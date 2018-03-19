@@ -137,7 +137,7 @@ const getOneUser = (req, res, next) => {
   if (req.query.include === 'networks') {
     isQueried = true
   }
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
     const users = t.one(sqlOneUser, {userid: req.params.userid}).then((user) => {
       return user
@@ -361,13 +361,11 @@ const createUser = (req, res, next) => {
 }
 
 const users = {
-  // jwt: jwt,
-  // auth: auth,
-  getAllUsers: getAllUsers,
-  getOneUser: getOneUser,
-  getUserNetworks: getUserNetworks,
-  createUser: createUser,
-  updateUser: updateUser
+  getAllUsers,
+  getOneUser,
+  getUserNetworks,
+  createUser,
+  updateUser
 }
 
 module.exports = users

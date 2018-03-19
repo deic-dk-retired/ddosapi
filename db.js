@@ -71,10 +71,10 @@ let miniQuery = (file) => {
 
 const db = {
   foddb: fodDb,
-  influxClient: influxClient,
+  influxClient,
   // InfluxnodeClient: InfluxnodeClient,
-  miniQuery: miniQuery,
-  promise: promise
+  miniQuery,
+  promise
 }
 
 module.exports = db

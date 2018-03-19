@@ -139,7 +139,6 @@
   }
 
   const createCustomer = (req, res, next) => {
-  // add customer networks
     const sqlCreateCustomer = db.miniQuery('.sql/customers/createCustomer.sql')
     db.foddb.tx((t) => {
       return t.one(sqlCreateCustomer, {
@@ -164,9 +163,7 @@
       })
     })
   .then((d) => {
-    console.log(d)
-    var jsonobj
-    jsonobj = {
+    let jsonobj = {
       type: 'customers',
       id: parseInt(d.customerid)
     }
@@ -199,14 +196,14 @@
     const sqlDeleteCoNetworks = db.miniQuery('.sql/customers/deleteNetwork.sql')
     db.foddb.tx((t) => {
       let txs = []
-      const isCo = t.any(sqlIsCustomer, {customerid: req.params.coid}).then(e => {
+      const isCo = t.any(sqlIsCustomer, {customerid: req.params.coid}).then((e) => {
         return e
       })
       if (isCo) {
         // find its networks
           // delete those networks
         // delete co
-        const isNet = t.any(sqlHasNetworks, {customerid: req.params.coid}).then(e => {
+        const isNet = t.any(sqlHasNetworks, {customerid: req.params.coid}).then((e) => {
           return e
         })
         if (isNet) {
@@ -289,15 +286,15 @@
   }
 
   const customers = {
-    getAllCustomers: getAllCustomers,
-    getAllNetworks: getAllNetworks,
-    getCustomerNetworks: getCustomerNetworks,
-    getOneCustomer: getOneCustomer,
-    createCustomer: createCustomer,
-    updateCustomer: updateCustomer,
-    removeCustomer: removeCustomer,
-    createNetwork: createNetwork,
-    removeNetwork: removeNetwork
+    getAllCustomers,
+    getAllNetworks,
+    getCustomerNetworks,
+    getOneCustomer,
+    createCustomer,
+    updateCustomer,
+    removeCustomer,
+    createNetwork,
+    removeNetwork
   }
 
   module.exports = customers
