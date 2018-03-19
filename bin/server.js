@@ -5,7 +5,6 @@ const Http = require('http')
 const server = Http.Server(app)
 const io = require('socket.io')(server)
 // const https = require('https')
-
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -20,6 +19,7 @@ const normalizePort = (val) => {
   return port
 }
 
+const port = normalizePort(process.env.PORT || process.env.RU_SERVER_PORT)
 /**
  * Event listener for HTTPS server "error" event.
  */
@@ -49,10 +49,6 @@ const onListening = () => {
   debug('Listening on ' + bind)
 }
 
-/**
- * Get port from environment and store in Express.
- */
-const port = normalizePort(process.env.PORT || process.env.RU_SERVER_PORT)
 app.set('port', port)
 
 /**
