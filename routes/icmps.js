@@ -1,6 +1,5 @@
 const express = require('express')
 const openRouter = express.Router()
-
 const icmp = require('../icmp')
 
 // openRouter.get('/')

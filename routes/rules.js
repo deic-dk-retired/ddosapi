@@ -1,6 +1,5 @@
 const express = require('express')
 const openRouter = express.Router()
-
 const rules = require('../rules')
 
 // openRouter.get('/')

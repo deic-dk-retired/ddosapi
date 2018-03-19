@@ -14,9 +14,9 @@ const getRules = (req, res, next) => {
     nxt = (parseInt(req.query.page) - 1)
   }
 
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
-    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then(rules => {
+    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then((rules) => {
       return rules
     })
     txs.push(prRules)
@@ -48,7 +48,7 @@ const getRules = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     res.status(200)
     res.json({
       data: d.rules,
@@ -59,7 +59,7 @@ const getRules = (req, res, next) => {
       }
     })
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err.stack)
     return next(err.message)
   })

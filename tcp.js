@@ -1,15 +1,15 @@
 // connect to db and then get the
 // query handler method
-var db = require('./db')
+const db = require('./db')
 
-function getTcps (req, res, next) {
-  var allTcp = db.miniQuery('.sql/misc/allTcps.sql')
+const getTcps = (req, res, next) => {
+  const allTcp = db.miniQuery('.sql/misc/allTcps.sql')
   db.foddb.any(allTcp)
-    .then(function (data) {
+    .then((data) => {
       // show jsonapi
       res.status(200)
       .json({
-        data: data.map(function (e) {
+        data: data.map((e) => {
           return {
             type: 'tcps',
             id: e.id,
@@ -24,7 +24,7 @@ function getTcps (req, res, next) {
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       return next(err.message)
     })
 }

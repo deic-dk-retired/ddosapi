@@ -10,14 +10,14 @@ const getAllUsers = (req, res, next) => {
   if (req.query.include === 'networks') {
     isQueried = true
   }
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
-    const prUsers = t.any(sqlAllUsers).then(users => {
+    const prUsers = t.any(sqlAllUsers).then((users) => {
       return users
     })
     txs.push(prUsers)
     if (isQueried) {
-      const prUsersNet = prUsers.map(u => {
+      const prUsersNet = prUsers.map((u) => {
         const networks = t.any(sqlUserNetworks, {userid: u.administratorid})
         return networks
       })
@@ -91,13 +91,13 @@ const getAllUsers = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     if (isQueried) {
       let inc = d.inc.reduce((a, b) => { return a.concat(b) })
-      let mapped = inc.map(function (e, i) {
+      let mapped = inc.map((e, i) => {
         return { i: i, value: e.id }
       })
-      mapped.sort(function (a, b) {
+      mapped.sort((a, b) => {
         if (a.value > b.value) {
           return 1
         }
@@ -109,7 +109,7 @@ const getAllUsers = (req, res, next) => {
       let sortinc = mapped.map((e) => {
         return inc[e.i]
       })
-      var uniq = sortinc.filter((item, index, self) => { return self.findIndex(obj => { return obj.id === item.id }) === index })
+      var uniq = sortinc.filter((item, index, self) => { return self.findIndex((obj) => { return obj.id === item.id }) === index })
     }
     res.status(200)
     if (isQueried) {
@@ -123,7 +123,7 @@ const getAllUsers = (req, res, next) => {
       })
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err.stack)
     return next(err.message)
   })
@@ -139,12 +139,12 @@ const getOneUser = (req, res, next) => {
   }
   db.foddb.tx(t => {
     let txs = []
-    const users = t.one(sqlOneUser, {userid: req.params.userid}).then(user => {
+    const users = t.one(sqlOneUser, {userid: req.params.userid}).then((user) => {
       return user
     })
     txs.push(users)
     if (isQueried) {
-      const usernet = users.then(user => {
+      const usernet = users.then((user) => {
         let networks = t.any(sqlUserNetworks, {userid: user.administratorid})
         return networks
       })
@@ -155,7 +155,7 @@ const getOneUser = (req, res, next) => {
       if (isQueried) {
         var un = []
         const n = args[1]
-        n.forEach(e => {
+        n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
           e.customerid = parseInt(e.customerid)
           e.administratorid = parseInt(e.administratorid)
@@ -212,7 +212,7 @@ const getOneUser = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     res.status(200)
     if (isQueried) {
       res.json({
@@ -225,7 +225,7 @@ const getOneUser = (req, res, next) => {
       })
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err.stack)
     return next(err.message)
   })

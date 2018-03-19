@@ -2,7 +2,6 @@
 // const jwt = require('jsonwebtoken')
 const express = require('express')
 const openRouter = express.Router()
-
 const users = require('../users')
 
 // openRouter.get('/')
