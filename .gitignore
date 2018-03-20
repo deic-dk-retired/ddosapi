@@ -1,7 +1,6 @@
 # ignore all logs
 *.log
 !debug.log
-*.sql
 
 # dependencies
 node_modules
