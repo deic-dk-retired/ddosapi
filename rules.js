@@ -10,7 +10,7 @@ const getRules = (req, res, next) => {
   let records = 10
   let offset = 0 // rows to skip, same as # of recent rules to fetch
   let nxt = 0
-  if (req.query.page !== undefined) {
+  if (typeof req.query.page !== 'undefined') {
     nxt = (parseInt(req.query.page) - 1)
   }
 
