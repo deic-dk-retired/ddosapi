@@ -7,6 +7,3 @@ node_modules
 
 # config and db
 .env
-.influxql
-.sql
-config/*.js
