@@ -18,7 +18,7 @@ const customers = require('./routes/customers')
 const fnm = require('./routes/fnm')
 const stats = require('./routes/stats')
 const app = express()
-const api = '/api'
+const api = '/' + process.env.RU_NAMESPACE
 
 // app.disable('x-powered-by')
 // app.use(helmet())

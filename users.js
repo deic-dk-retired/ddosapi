@@ -1,9 +1,9 @@
 const db = require('./db')
-const url = 'http://10.33.1.97:4242/api/users/'
+const url = db.serveUrl + '/users/'
 
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
-  const sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   let jsonarr = []
   let jsonobj = {}
   let isQueried = false
@@ -130,7 +130,7 @@ const getAllUsers = (req, res, next) => {
 }
 
 const getOneUser = (req, res, next) => {
-  const sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   const sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
   let jsonobj = {}
   let isQueried = false
@@ -234,7 +234,7 @@ const getOneUser = (req, res, next) => {
 const getUserNetworks = (req, res, next) => {
   var prarr = null
   var probj = null
-  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  var sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
     .then((data) => {
       if (data.length > 1) {

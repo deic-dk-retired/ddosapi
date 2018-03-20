@@ -1,6 +1,6 @@
 const moment = require('moment')
 const db = require('./db')
-const url = 'http://10.33.1.97:4242/api/rules/'
+const url = db.serveUrl + '/rules/'
 
 const getRules = (req, res, next) => {
   const sqlGetAllRules = db.miniQuery('.sql/rules/allRules.sql')
@@ -137,7 +137,6 @@ const createRule = (req, res, next) => {
       }
       delete d[0].flowspecruleid
       jsonobj.attributes = d.pop()
-      console.log(jsonobj)
       res.status(201)
       .json({
         data: jsonobj,

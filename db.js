@@ -18,7 +18,8 @@ const connectStringFod =
   process.env.RU_PWD + '@' +
   process.env.RU_HOST + '/' +
   process.env.RU_SCHEMA
-var fodDb = pgp(connectStringFod)
+const fodDb = pgp(connectStringFod)
+const serveUrl = '/' + process.env.RU_NAMESPACE
 
 /**
  *  check connection for postgre sql
@@ -43,26 +44,26 @@ influxClient.getDatabaseNames()
   }
 })
 .catch((err) => {
-  console.log('Error looking up graphite unsing influx!')
+  console.log('Error looking up graphite unsing influx!, %o', err)
   return err.message
 })
 
 /**
  * check for db graphite on influxdb and show all the dbs listening on
  */
-InfluxnodeClient.showDatabases()
-.then((names) => {
-  console.log('stream2: ' + names.join(', '))
-  if (!names.includes('graphite')) {
-    console.log('graphite not found, please check the db named grahite exists at' + process.env.IF_HOST + ':8083')
-  } else {
-    console.log('Listening on graphite using influxdb-nodejs')
-  }
-})
-.catch((err) => {
-  console.log('Error looking up graphite using influxdb-nodejs!')
-  return err.message
-})
+// InfluxnodeClient.showDatabases()
+// .then((names) => {
+//   console.log('stream2: ' + names.join(', '))
+//   if (!names.includes('graphite')) {
+//     console.log('graphite not found, please check the db named grahite exists at' + process.env.IF_HOST + ':8083')
+//   } else {
+//     console.log('Listening on graphite using influxdb-nodejs')
+//   }
+// })
+// .catch((err) => {
+//   console.log('Error looking up graphite using influxdb-nodejs!')
+//   return err.message
+// })
 
 let miniQuery = (file) => {
   const fullPath = path.join(__dirname, file)
@@ -72,9 +73,9 @@ let miniQuery = (file) => {
 const db = {
   foddb: fodDb,
   influxClient,
-  // InfluxnodeClient: InfluxnodeClient,
   miniQuery,
-  promise
+  promise,
+  serveUrl
 }
 
 module.exports = db

@@ -1,6 +1,6 @@
   const db = require('./db')
-  const courl = 'http://10.33.1.97:4242/api/customers/'
-  const neturl = 'http://10.33.1.97:4242/api/networks/'
+  const courl = db.serveUrl + '/customers/'
+  const neturl = db.serveUrl + '/networks/'
 
   const getAllCustomers = (req, res, next) => {
   /*
