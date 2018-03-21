@@ -1,6 +1,6 @@
   const db = require('./db')
-  const courl = 'http://10.33.1.97:4242/api/customers/'
-  const neturl = 'http://10.33.1.97:4242/api/networks/'
+  const courl = db.serveUrl + '/customers/'
+  const neturl = db.serveUrl + '/networks/'
 
   const getAllCustomers = (req, res, next) => {
   /*
@@ -9,11 +9,11 @@
   */
     const sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
     db.foddb.any(sqlAllCustomers)
-    .then(function (data) {
+    .then((data) => {
       // create json api array
       var jsonarr = []
       var jsonobj
-      data.map(function (e) {
+      data.map((e) => {
         jsonobj = {
           type: 'customers',
           id: parseInt(e.customerid),
@@ -34,7 +34,7 @@
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
@@ -44,10 +44,10 @@
   const getAllNetworks = (req, res, next) => {
     const sqlallNetworks = db.miniQuery('.sql/customers/allNetworks.sql')
     db.foddb.any(sqlallNetworks)
-    .then(function (data) {
+    .then((data) => {
       var jsonarr = []
       var jsonobj
-      data.map(function (e) {
+      data.map((e) => {
         jsonobj = {
           type: 'networks',
           id: parseInt(e.customernetworkid),
@@ -67,7 +67,7 @@
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
@@ -77,10 +77,10 @@
   const getCustomerNetworks = (req, res, next) => {
     const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
     db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
-    .then(function (data) {
+    .then((data) => {
       var jsonarr = []
       var jsonobj
-      data.map(function (e) {
+      data.map((e) => {
         jsonobj = {
           type: 'networks',
           id: parseInt(e.customernetworkid),
@@ -101,7 +101,7 @@
         }
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
@@ -132,16 +132,15 @@
         data: jsonobj
       })
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
   }
 
   const createCustomer = (req, res, next) => {
-  // add customer networks
     const sqlCreateCustomer = db.miniQuery('.sql/customers/createCustomer.sql')
-    db.foddb.tx(t => {
+    db.foddb.tx((t) => {
       return t.one(sqlCreateCustomer, {
         couuid: req.params.couuid,
         coname: req.params.coname,
@@ -163,10 +162,8 @@
         codesc: req.params.ccodesc
       })
     })
-  .then(d => {
-    console.log(d)
-    var jsonobj
-    jsonobj = {
+  .then((d) => {
+    let jsonobj = {
       type: 'customers',
       id: parseInt(d.customerid)
     }
@@ -181,7 +178,7 @@
         }
       })
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err.stack)
     return next(err.message)
   })
@@ -197,16 +194,16 @@
     const sqlIsCustomer = db.miniQuery('.sql/customers/isCustomer.sql')
     const sqlDeleteCo = db.miniQuery('.sql/customers/deleteCustomer.sql')
     const sqlDeleteCoNetworks = db.miniQuery('.sql/customers/deleteNetwork.sql')
-    db.foddb.tx(t => {
+    db.foddb.tx((t) => {
       let txs = []
-      const isCo = t.any(sqlIsCustomer, {customerid: req.params.coid}).then(e => {
+      const isCo = t.any(sqlIsCustomer, {customerid: req.params.coid}).then((e) => {
         return e
       })
       if (isCo) {
         // find its networks
           // delete those networks
         // delete co
-        const isNet = t.any(sqlHasNetworks, {customerid: req.params.coid}).then(e => {
+        const isNet = t.any(sqlHasNetworks, {customerid: req.params.coid}).then((e) => {
           return e
         })
         if (isNet) {
@@ -215,7 +212,7 @@
       }
       // return t.batch([hasNets, isCo])
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err.stack)
       return next(err.message)
     })
@@ -278,7 +275,7 @@
       .json({
         meta: {
           status: 'OK',
-          status: 'successfully removed network'
+          message: 'successfully removed network'
         }
       })
     })
@@ -289,15 +286,15 @@
   }
 
   const customers = {
-    getAllCustomers: getAllCustomers,
-    getAllNetworks: getAllNetworks,
-    getCustomerNetworks: getCustomerNetworks,
-    getOneCustomer: getOneCustomer,
-    createCustomer: createCustomer,
-    updateCustomer: updateCustomer,
-    removeCustomer: removeCustomer,
-    createNetwork: createNetwork,
-    removeNetwork: removeNetwork
+    getAllCustomers,
+    getAllNetworks,
+    getCustomerNetworks,
+    getOneCustomer,
+    createCustomer,
+    updateCustomer,
+    removeCustomer,
+    createNetwork,
+    removeNetwork
   }
 
   module.exports = customers

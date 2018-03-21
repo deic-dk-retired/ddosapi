@@ -1,6 +1,6 @@
 const moment = require('moment')
 const db = require('./db')
-const url = 'http://10.33.1.97:4242/api/rules/'
+const url = db.serveUrl + '/rules/'
 
 const getRules = (req, res, next) => {
   const sqlGetAllRules = db.miniQuery('.sql/rules/allRules.sql')
@@ -10,13 +10,13 @@ const getRules = (req, res, next) => {
   let records = 10
   let offset = 0 // rows to skip, same as # of recent rules to fetch
   let nxt = 0
-  if (req.query.page !== undefined) {
+  if (typeof req.query.page !== 'undefined') {
     nxt = (parseInt(req.query.page) - 1)
   }
 
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
-    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then(rules => {
+    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then((rules) => {
       return rules
     })
     txs.push(prRules)
@@ -48,7 +48,7 @@ const getRules = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     res.status(200)
     res.json({
       data: d.rules,
@@ -59,7 +59,7 @@ const getRules = (req, res, next) => {
       }
     })
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err.stack)
     return next(err.message)
   })
@@ -137,7 +137,6 @@ const createRule = (req, res, next) => {
       }
       delete d[0].flowspecruleid
       jsonobj.attributes = d.pop()
-      console.log(jsonobj)
       res.status(201)
       .json({
         data: jsonobj,
@@ -175,11 +174,11 @@ const updateRule = (req, res, next) => {
 }
 
 const rules = {
-  getRules: getRules,
-  getRuleById: getRuleById,
-  getRuleDetail: getRuleDetail,
-  createRule: createRule,
-  updateRule: updateRule
+  getRules,
+  getRuleById,
+  getRuleDetail,
+  createRule,
+  updateRule
 }
 
 module.exports = rules

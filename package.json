@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/server",
     "watch": "nodemon ./bin/server",
-    "test": "snyk test"
+    "test": "npm test"
   },
   "author": "Ashokaditya",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "compression": "^1.7.1",
     "cors": "^2.8.4",
     "crypto-json": "^2.0.0",
+    "debug": "^3.1.0",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
@@ -41,7 +42,6 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "nodemon": "^1.12.1",
-    "snyk": "^1.52.1"
+    "nodemon": "^1.12.1"
   }
 }

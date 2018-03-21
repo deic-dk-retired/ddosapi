@@ -1,6 +1,5 @@
-const express = require('express')
-const openRouter = express.Router()
-
+const Express = require('express')
+const openRouter = Express.Router()
 const rules = require('../rules')
 
 // openRouter.get('/')

@@ -1,8 +1,7 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
-const express = require('express')
-const openRouter = express.Router()
-
+const Express = require('express')
+const openRouter = Express.Router()
 const auth = require('../auth')
 
 // openRouter.get('/')
@@ -23,7 +22,7 @@ openRouter.use((req, res, next) => {
     })
   }
   if (token) {
-    jwt.verify(token, process.env.SU_SEC, function (err, decoded) {
+    jwt.verify(token, process.env.SU_SEC, (err, decoded) => {
       if (err) {
         return res.status(404).json({
           status: 404,

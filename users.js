@@ -1,23 +1,23 @@
 const db = require('./db')
-const url = 'http://10.33.1.97:4242/api/users/'
+const url = db.serveUrl + '/users/'
 
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
-  const sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   let jsonarr = []
   let jsonobj = {}
   let isQueried = false
   if (req.query.include === 'networks') {
     isQueried = true
   }
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
-    const prUsers = t.any(sqlAllUsers).then(users => {
+    const prUsers = t.any(sqlAllUsers).then((users) => {
       return users
     })
     txs.push(prUsers)
     if (isQueried) {
-      const prUsersNet = prUsers.map(u => {
+      const prUsersNet = prUsers.map((u) => {
         const networks = t.any(sqlUserNetworks, {userid: u.administratorid})
         return networks
       })
@@ -91,13 +91,13 @@ const getAllUsers = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     if (isQueried) {
       let inc = d.inc.reduce((a, b) => { return a.concat(b) })
-      let mapped = inc.map(function (e, i) {
+      let mapped = inc.map((e, i) => {
         return { i: i, value: e.id }
       })
-      mapped.sort(function (a, b) {
+      mapped.sort((a, b) => {
         if (a.value > b.value) {
           return 1
         }
@@ -109,7 +109,7 @@ const getAllUsers = (req, res, next) => {
       let sortinc = mapped.map((e) => {
         return inc[e.i]
       })
-      var uniq = sortinc.filter((item, index, self) => { return self.findIndex(obj => { return obj.id === item.id }) === index })
+      var uniq = sortinc.filter((item, index, self) => { return self.findIndex((obj) => { return obj.id === item.id }) === index })
     }
     res.status(200)
     if (isQueried) {
@@ -123,28 +123,28 @@ const getAllUsers = (req, res, next) => {
       })
     }
   })
-  .catch(err => {
-    console.error(err.stack)
+  .catch((err) => {
+    console.log(err.stack)
     return next(err.message)
   })
 }
 
 const getOneUser = (req, res, next) => {
-  const sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   const sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
   let jsonobj = {}
   let isQueried = false
   if (req.query.include === 'networks') {
     isQueried = true
   }
-  db.foddb.tx(t => {
+  db.foddb.tx((t) => {
     let txs = []
-    const users = t.one(sqlOneUser, {userid: req.params.userid}).then(user => {
+    const users = t.one(sqlOneUser, {userid: req.params.userid}).then((user) => {
       return user
     })
     txs.push(users)
     if (isQueried) {
-      const usernet = users.then(user => {
+      const usernet = users.then((user) => {
         let networks = t.any(sqlUserNetworks, {userid: user.administratorid})
         return networks
       })
@@ -155,7 +155,7 @@ const getOneUser = (req, res, next) => {
       if (isQueried) {
         var un = []
         const n = args[1]
-        n.forEach(e => {
+        n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
           e.customerid = parseInt(e.customerid)
           e.administratorid = parseInt(e.administratorid)
@@ -212,7 +212,7 @@ const getOneUser = (req, res, next) => {
       }
     })
   })
-  .then(d => {
+  .then((d) => {
     res.status(200)
     if (isQueried) {
       res.json({
@@ -225,8 +225,8 @@ const getOneUser = (req, res, next) => {
       })
     }
   })
-  .catch(err => {
-    console.error(err.stack)
+  .catch((err) => {
+    console.log(err.stack)
     return next(err.message)
   })
 }
@@ -234,7 +234,7 @@ const getOneUser = (req, res, next) => {
 const getUserNetworks = (req, res, next) => {
   var prarr = null
   var probj = null
-  var sqlUserNetworks = db.miniQuery('.sql/customers/userNetworks.sql')
+  var sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   db.foddb.any(sqlUserNetworks, {userid: req.params.userid})
     .then((data) => {
       if (data.length > 1) {
@@ -270,7 +270,7 @@ const getUserNetworks = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
@@ -325,7 +325,7 @@ const updateUser = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
@@ -355,19 +355,17 @@ const createUser = (req, res, next) => {
       })
     })
     .catch((err) => {
-      console.error(err.stack)
+      console.log(err.stack)
       return next(err.message)
     })
 }
 
 const users = {
-  // jwt: jwt,
-  // auth: auth,
-  getAllUsers: getAllUsers,
-  getOneUser: getOneUser,
-  getUserNetworks: getUserNetworks,
-  createUser: createUser,
-  updateUser: updateUser
+  getAllUsers,
+  getOneUser,
+  getUserNetworks,
+  createUser,
+  updateUser
 }
 
 module.exports = users

@@ -18,6 +18,7 @@ const customers = require('./routes/customers')
 const fnm = require('./routes/fnm')
 const stats = require('./routes/stats')
 const app = express()
+const api = '/' + process.env.RU_NAMESPACE
 
 // app.disable('x-powered-by')
 // app.use(helmet())
@@ -52,14 +53,14 @@ app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', index)
-app.use('/api', auth)
-app.use('/api', customers)
-app.use('/api', fnm)
-app.use('/api', icmps)
-app.use('/api', rules)
-app.use('/api', stats)
-app.use('/api', tcps)
-app.use('/api', users)
+app.use(api, auth)
+app.use(api, customers)
+app.use(api, fnm)
+app.use(api, icmps)
+app.use(api, rules)
+app.use(api, stats)
+app.use(api, tcps)
+app.use(api, users)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -71,10 +72,9 @@ app.use(function (req, res, next) {
   delete req.session.success
   delete req.session.notice
 
-  if (err) res.locals.error = err
-  if (msg) res.locals.notice = msg
-  if (success) res.locals.success = success
-
+  if (err) { res.locals.error = err }
+  if (msg) { res.locals.notice = msg }
+  if (success) { res.locals.success = success }
   next()
 })
 

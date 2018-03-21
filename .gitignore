@@ -1,13 +1,9 @@
 # ignore all logs
 *.log
 !debug.log
-*.sql
 
 # dependencies
 node_modules
 
 # config and db
 .env
-.influxql
-.sql
-config/*.js
