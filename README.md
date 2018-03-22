@@ -1,8 +1,8 @@
 # README #
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b655c079dd3d41fda19c4d45e1256bb5)](https://app.codacy.com/app/DeIC/ddps-node?utm_source=github.com&utm_medium=referral&utm_content=deic-dk/ddps-node&utm_campaign=badger)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b655c079dd3d41fda19c4d45e1256bb5)](https://app.codacy.com/app/DeIC/ddps-node?utm_source=github.com&utm_medium=referral&utm_content=deic-dk/ddps-node&utm_campaign=badger) [![Maintainability](https://api.codeclimate.com/v1/badges/1a97a8ffec0cf7105b85/maintainability)](https://codeclimate.com/github/deic-dk/ddps-node/maintainability)
 
-This repository is for the ddos api application built with Express, a fast minimalist web framework for Node.
+Endpoint api for the ddps client app. Built using [!jsonapi v1.0](http://jsonapi.org) specifications.
 
 ### App architecture? ###
 
