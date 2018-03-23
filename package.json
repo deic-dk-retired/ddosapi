@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/server",
     "watch": "nodemon ./bin/server",
-    "test": "npm test"
+    "test": "snyk test && npm test"
   },
   "author": "Ashokaditya",
   "license": "ISC",
@@ -29,8 +29,6 @@
     "method-override": "^2.3.10",
     "moment": "^2.20.0",
     "morgan": "^1.9.0",
-    "passport": "^0.3.2",
-    "passport-jwt": "^2.2.1",
     "pg": "^7.4.0",
     "pg-promise": "^6.10.3",
     "socket.io": "^2.0.4"
@@ -42,6 +40,7 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "snyk": "^1.69.10"
   }
 }

@@ -1,4 +1,22 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.7.1
-ignore: {}
+version: v1.10.2
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'npm:node-forge:20180226':
+    - greenlock-express > greenlock > rsa-compat > node-forge:
+        reason: reinstall does not fix it
+        expires: '2018-04-22T09:31:56.083Z'
+    - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > node-forge:
+        reason: 'greenlock '
+        expires: '2018-04-22T09:31:56.083Z'
+    - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > rsa-compat > node-forge:
+        reason: greenlock
+        expires: '2018-04-22T09:31:56.083Z'
+    - greenlock-express > greenlock > le-acme-core > rsa-compat > node-forge:
+        reason: greenlock
+        expires: '2018-04-22T09:31:56.084Z'
+  'npm:lodash:20180130':
+    - influxdb-nodejs > lodash:
+        reason: reinstall doesn't fix it
+        expires: '2018-04-22T09:31:56.083Z'
 patch: {}

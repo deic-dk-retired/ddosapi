@@ -7,7 +7,7 @@ const path = require('path')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 // const methodOverride = require('method-override')
-const passport = require('passport')
+// const passport = require('passport')
 const index = require('./routes/index')
 const auth = require('./routes/auth')
 const tcps = require('./routes/tcps')
@@ -46,7 +46,7 @@ app.set('view engine', 'jade')
 
 // log to console
 app.use(morgan('dev'))
-app.use(passport.initialize())
+// app.use(passport.initialize())
 // get req params
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
