@@ -1,8 +1,8 @@
 require('dotenv').config()
 const promise = require('bluebird')
 const path = require('path')
-const Influxnode = require('influxdb-nodejs')
-const InfluxnodeClient = new Influxnode('http://' + process.env.IF_HOST + ':8086/' + process.env.IF_SCHEMA)
+// const Influxnode = require('influxdb-nodejs')
+// const InfluxnodeClient = new Influxnode('http://' + process.env.IF_HOST + ':8086/' + process.env.IF_SCHEMA)
 const Influx = require('influx')
 const influxClient = new Influx.InfluxDB({
   host: process.env.IF_HOST,
