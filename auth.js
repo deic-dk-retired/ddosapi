@@ -13,6 +13,8 @@ const authenticate = (req, res, next) => {
     encoding: 'hex'
   })
 
+  let ttoexp = '3m'
+
   db.foddb.any(verUsername, {username: id.un})
   .then((d) => {
     if (d.length === 0) { //! user
@@ -39,13 +41,14 @@ const authenticate = (req, res, next) => {
                 co: d[0].companyname
               }
               let token = jwt.sign(payload, process.env.SU_SEC, {
-                expiresIn: '4h',
+                expiresIn: ttoexp,
                 algorithm: 'HS512',
                 issuer: process.env.SU_ISSUER
               })
               delete payload.ddpsEng
               delete payload.userid
               delete payload.co
+              payload.texp = ttoexp
               res.status(200)
               .json({
                 type: 'auth',

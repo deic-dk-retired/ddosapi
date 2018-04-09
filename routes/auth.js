@@ -24,11 +24,21 @@ openRouter.use((req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.SU_SEC, (err, decoded) => {
       if (err) {
-        return res.status(404).json({
-          status: 404,
-          success: false,
-          message: 'Invalid token. Failed to authenticate!'
-        })
+        if (err.name === 'TokenExpiredError') {
+          return res.status(404).json({
+            status: 404,
+            success: false,
+            expiredAt: err.expiredAt,
+            message: err.message
+          })
+        }
+        if (err.name === 'JsonWebTokenError') {
+          return res.status(403).json({
+            status: 403,
+            success: false,
+            message: err.message
+          })
+        }
       } else {
         req.decoded = decoded
         next()

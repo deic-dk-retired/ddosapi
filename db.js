@@ -6,6 +6,7 @@ const path = require('path')
 const Influx = require('influx')
 const influxClient = new Influx.InfluxDB({
   host: process.env.IF_HOST,
+  port: process.env.IF_HOST_PORT,
   database: process.env.IF_SCHEMA
 })
 const options = {
