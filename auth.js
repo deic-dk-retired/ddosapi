@@ -13,7 +13,7 @@ const authenticate = (req, res, next) => {
     encoding: 'hex'
   })
 
-  let ttoexp = '3m'
+  let ttoexp = '7h'
 
   db.foddb.any(verUsername, {username: id.un})
   .then((d) => {
