@@ -27,25 +27,25 @@ const serveUrl = '/' + process.env.RU_NAMESPACE
  */
 fodDb.connect()
 .then((obj) => {
-  console.log('listening on ' + obj.client.database + ' using pg-promise')
+  console.log(`listening on ${obj.client.database} using pg-promise`)
 })
 .catch((err) => {
-  console.log('Error connection to postgre: %o', err)
+  console.log(`Error connection to postgre: %o`, err)
 })
 /**
  * check for db graphite on influxdb and show all the dbs listening on
  */
 influxClient.getDatabaseNames()
 .then((names) => {
-  console.log('stream1: ' + names.join(', '))
-  if (!names.includes('graphite')) {
-    console.log('graphite not found, please check the db named grahite exists at' + process.env.IF_HOST + ':8083')
+  console.log(`stream1: ${names.join(', ')}`)
+  if (!names.includes(`graphite`)) {
+    console.log(`graphite not found, please check the db named grahite exists at ${process.env.IF_HOST}:8083`)
   } else {
-    console.log('Listening on graphite using influx')
+    console.log(`Listening on graphite using influx`)
   }
 })
 .catch((err) => {
-  console.log('Error looking up graphite unsing influx!, %o', err)
+  console.log(`Error looking up graphite unsing influx!, %o`, err)
   return err.message
 })
 

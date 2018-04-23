@@ -13,7 +13,7 @@ const authenticate = (req, res, next) => {
     encoding: 'hex'
   })
 
-  let ttoexp = '7h'
+  let ttoexp = '2h'
 
   db.foddb.any(verUsername, {username: id.un})
   .then((d) => {
@@ -58,7 +58,7 @@ const authenticate = (req, res, next) => {
                   id: d[0].administratorid,
                   attributes: payload,
                   links: {
-                    self: '/api/users/' + d[0].administratorid
+                    self: `/api/users/${d[0].administratorid}`
                   }
                 }],
                 status: '200',
