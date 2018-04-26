@@ -114,7 +114,7 @@ const createRule = (req, res, next) => {
       ruleuuid: req.body.ruleuuid,
       rulename: req.body.ruleuuid,
       couuid: req.body.couuid,
-      useruuid: req.body.useruuid,
+      userid: req.body.userid,
       fmnuuid: req.body.fmnuuid,
       validfrom: req.body.validfrom,
       validto: req.body.validto,

@@ -1,6 +1,6 @@
  SELECT DISTINCT
-  f.administratorid
-, f.uuid_administratorid "useruuid"
+  -- f.administratorid
+  f.uuid_administratorid "administratorid"
 , f.customerid
 , f.uuid_customerid "couuid"
 , c.companyname

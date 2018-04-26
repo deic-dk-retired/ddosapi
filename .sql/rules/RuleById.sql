@@ -2,7 +2,7 @@ SELECT distinct
 f.flowspecruleid "id",
 f.uuid_flowspecruleid "ruleuuid",
 f.uuid_customerid "couuid",
-f.uuid_administratorid "useruuid",
+f.uuid_administratorid "userid",
 f.uuid_fastnetmoninstanceid "fmnuuid",
 rule_name "rname",
 direction "direct",

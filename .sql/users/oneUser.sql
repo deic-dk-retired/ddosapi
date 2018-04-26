@@ -1,6 +1,6 @@
 SELECT
-  f.administratorid
-, f.uuid_administratorid "useruuid"
+  -- f.administratorid
+  f.uuid_administratorid "administratorid"
 , f.uuid_customerid "couuid"
 , f.customerid
 , c.companyname
@@ -16,5 +16,5 @@ SELECT
 FROM flow.administrators f
 LEFT JOIN flow.customers c
 ON f.customerid = c.customerid
-WHERE f.administratorid = $(userid)
+WHERE f.uuid_administratorid = $(userid)
 -- AND f.valid = 'active'

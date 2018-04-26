@@ -30,7 +30,7 @@ VALUES
   $(ruleuuid),
   $(rulename),
   $(couuid),
-  $(useruuid),
+  $(userid),
   'in',
   $(validfrom),
   $(validto),

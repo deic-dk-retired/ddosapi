@@ -1,5 +1,5 @@
 UPDATE flow.administrators
 SET valid = 'active'
-WHERE administratorid = $(userid);
+WHERE uuid_administratorid = $(userid);
 
 COMMIT;
