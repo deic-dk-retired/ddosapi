@@ -1,5 +1,4 @@
 SELECT
-  -- f.administratorid
   f.uuid_administratorid "administratorid"
 , c.companyname
 , f.kind

@@ -7,6 +7,7 @@ const authenticate = (req, res, next) => {
   const sqlUserAccess = db.miniQuery('.sql/users/userAccess.sql')
   const verUsername = db.miniQuery('.sql/users/isUser.sql')
   const verActiveUser = db.miniQuery('.sql/users/userStatus.sql')
+  const updateLastLogin = db.miniQuery('.sql/users/updateLastLogin.sql')
 
   let id = crptojs.decrypt(req.body, process.env.SU_SEC_3SHA512, {
     algorithm: 'aes256',
@@ -30,6 +31,8 @@ const authenticate = (req, res, next) => {
           return db.foddb.any(sqlUserAccess, {username: id.un, password: id.ke})
           .then((d) => { // password matches
             if (d[0].hasAccess) {
+              // update lastlogin time
+              db.foddb.any(updateLastLogin, {username: d[0].username})
               let payload = {
                 ddpsEng: 'fastnetmon',
                 clnt: req.ip,

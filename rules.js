@@ -118,6 +118,8 @@ const createRule = (req, res, next) => {
       fmnuuid: req.body.fmnuuid,
       validfrom: req.body.validfrom,
       validto: req.body.validto,
+      srcip: req.body.srcip,
+      srcport: req.body.srcport,
       destip: req.body.destip,
       destport: req.body.destport,
       protocol: req.body.protocol,

@@ -18,7 +18,12 @@ const getFnms = (req, res, next) => {
             attributes: {
               fnmid: e.fnmid,
               couuid: e.couuid,
-              coid: e.coid
+              coid: e.coid,
+              netlist: e.netList,
+              hostname: e.hostname,
+              procintraffic: e.procInTraffic,
+              procouttraffic: e.procOutTraffic,
+              status: e.status
             }
           }
         }),
