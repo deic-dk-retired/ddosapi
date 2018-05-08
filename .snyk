@@ -1,20 +1,41 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.10.2
+version: v1.12.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
   'npm:node-forge:20180226':
     - greenlock-express > greenlock > rsa-compat > node-forge:
         reason: reinstall does not fix it
         expires: '2018-04-22T09:31:56.083Z'
+      greenlock-express > greenlock > le-challenge-sni > le-tls-sni > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:02:12.372Z'
     - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > node-forge:
         reason: 'greenlock '
         expires: '2018-04-22T09:31:56.083Z'
+      greenlock-express > greenlock > le-challenge-sni > le-tls-sni > rsa-compat > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:02:12.372Z'
     - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > rsa-compat > node-forge:
         reason: greenlock
         expires: '2018-04-22T09:31:56.083Z'
+      greenlock-express > greenlock > rsa-compat > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:02:12.373Z'
     - greenlock-express > greenlock > le-acme-core > rsa-compat > node-forge:
         reason: greenlock
         expires: '2018-04-22T09:31:56.084Z'
+      greenlock-express > greenlock > acme-v2 > rsa-compat > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:02:12.373Z'
+    - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > node-forge:
+        reason: no patch available yet
+        expires: '2018-06-07T08:01:05.012Z'
+      greenlock-express > greenlock > le-acme-core > rsa-compat > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:02:12.373Z'
+    - greenlock-express > greenlock > le-challenge-sni > le-tls-sni > rsa-compat > node-forge:
+        reason: no patch yet
+        expires: '2018-06-07T08:01:05.012Z'
   'npm:lodash:20180130':
     - influxdb-nodejs > lodash:
         reason: reinstall doesn't fix it
