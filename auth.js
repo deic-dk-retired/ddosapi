@@ -43,6 +43,9 @@ const authenticate = (req, res, next) => {
                 usrtype: d[0].kind,
                 co: d[0].companyname
               }
+              if (d[0].kind !== 'globaladmin') {
+                payload.coid = d[0].coid
+              }
               let token = jwt.sign(payload, process.env.SU_SEC, {
                 expiresIn: ttoexp,
                 algorithm: 'HS512',

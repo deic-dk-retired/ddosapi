@@ -245,6 +245,8 @@ const getUserNetworks = (req, res, next) => {
             id: parseInt(e.customernetworkid)
           }
           delete e.customernetworkid
+          delete e.networks
+          delete e.administratorid
           probj.attributes = e
           prarr.push(probj)
         })
@@ -255,6 +257,8 @@ const getUserNetworks = (req, res, next) => {
           id: parseInt(data[0].customernetworkid)
         }
         delete data[0].customernetworkid
+        delete data[0].networks
+        delete data[0].administratorid
         probj.attributes = data[0]
         prarr = probj
       }

@@ -4,9 +4,8 @@ const debug = require('debug')('node-postgres-promises:server')
 const Http = require('http')
 const server = Http.Server(app)
 const io = require('socket.io')(server)
-// const https = require('https')
 /**
- * Normalize a port into a number, string, or false.
+ * Normalize a port into a number.
  */
 const normalizePort = (val) => {
   let port = null
@@ -21,7 +20,7 @@ const normalizePort = (val) => {
 
 const port = normalizePort(process.env.PORT || process.env.RU_SERVER_PORT)
 /**
- * Event listener for HTTPS server "error" event.
+ * Event listener for HTTP server "error" event.
  */
 const onError = (error) => {
   if (error.syscall !== 'listen') {
@@ -38,7 +37,7 @@ const onError = (error) => {
 }
 
 /**
- * Event listener for HTTPS server "listening" event.
+ * Event listener for HTTP server "listening" event.
  */
 const onListening = () => {
   let addr = server.address()
@@ -50,21 +49,6 @@ const onListening = () => {
 }
 
 app.set('port', port)
-
-/**
- * Create HTTPS server.
- */
-// const options = {
-//   key: fs.readFileSync('noapi_key.pem'),
-//   cert: fs.readFileSync('noapi_cert.pem'),
-//   requestCert: true,
-//   rejectUnauthorized: true
-// }
-
-// const server = https.Server(options, app, (req, res) => {
-//   console.log('authorized: ', req.socket.authorized)
-//   console.log('client certificate: ', req.socket.getPeerCertificate())
-// })
 
 /**
  * Listen on provided port, on all network interfaces.

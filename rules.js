@@ -3,20 +3,26 @@ const db = require('./db')
 const url = db.serveUrl + '/rules/'
 
 const getRules = (req, res, next) => {
-  const sqlGetAllRules = db.miniQuery('.sql/rules/allRules.sql')
+  const sqlGetAllRules = db.miniQuery('.sql/rules/allRulesByUser.sql')
   // const sqlRulesCount = db.miniQuery('.sql/rules/rulesCount.sql')
   let jsonarr = []
   let jsonobj = {}
   let records = 10
   let offset = 0 // rows to skip, same as # of recent rules to fetch
   let nxt = 0
-  if (typeof req.query.page !== 'undefined') {
-    nxt = (parseInt(req.query.page) - 1)
-  }
+  typeof req.query.page !== 'undefined' ? nxt = (parseInt(req.query.page) - 1) : nxt = 0
+  typeof req.query.offset !== 'undefined' ? offset = parseInt(req.query.offset) : offset = 0
+  typeof req.query.records !== 'undefined' ? records = parseInt(req.query.records) : records = 10
+  let loggeduser = req.decoded.userid
+  // console.log(req.decoded.userid)
 
   db.foddb.tx((t) => {
     let txs = []
-    const prRules = t.any(sqlGetAllRules, {rows: records, next: offset + records * nxt}).then((rules) => {
+    const prRules = t.any(sqlGetAllRules, {
+      rows: records,
+      next: offset + records * nxt,
+      userid: loggeduser
+    }).then((rules) => {
       return rules
     })
     txs.push(prRules)
