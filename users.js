@@ -151,7 +151,7 @@ const getOneUser = (req, res, next) => {
       const u = args[0]
       let un = []
       if (isQueried) {
-        const n = args[0].usrnets
+        const n = args[1]
         console.log(args)
         n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
@@ -159,13 +159,24 @@ const getOneUser = (req, res, next) => {
           e.administratorid = e.administratorid
         })
         if (n.length > 1) {
-          un = n.map((e) => { return { type: 'networks', id: e } })
+          un = n.map((e) => {
+            let nobj = {
+              type: 'networks',
+              id: e.customernetworkid
+            }
+            delete e.customernetworkid
+            nobj.attributes = e
+            return nobj
+          })
         }
         if (n.length === 1) {
-          un.push({
+          let nobj = {
             type: 'networks',
             id: n[0]
-          })
+          }
+          delete n[0].customernetworkid
+          nobj.attributes = n[0]
+          un.push(nobj)
         }
       }
       jsonobj = {
