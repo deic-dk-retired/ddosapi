@@ -3,75 +3,53 @@ const url = db.serveUrl + '/users/'
 
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
-  const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
+  const sqlUsersNetworks = db.miniQuery('.sql/users/usersNetworks.sql')
   let jsonarr = []
+  let incNets = []
   let jsonobj = {}
   let isQueried = false
   if (req.query.include === 'networks') {
     isQueried = true
   }
   db.foddb.tx((t) => {
+    let resObj = {}
     let txs = []
-    const prUsers = t.any(sqlAllUsers).then((users) => {
-      return users
-    })
+    const prUsers = t.any(sqlAllUsers)
+      .then(users => users)
     txs.push(prUsers)
-    if (isQueried) {
-      const prUsersNet = prUsers.map((u) => {
-        const networks = t.any(sqlUserNetworks, {userid: u.uuid_administratorid})
-        return networks
-      })
-      txs.push(prUsersNet)
-    }
+
     return db.promise.all(txs).then((args) => {
       const u = args[0]
       if (isQueried) {
-        const n = args[1]
-        var usernets = n.map((e) => {
-          let un = []
-          if (e.length > 1) {
-            let prarr = []
-            e.map((f) => {
-              let nobj = {
-                type: 'networks',
-                id: parseInt(f.customernetworkid)
-              }
-              delete f.customernetworkid
-              nobj.attributes = f
-              prarr.push(nobj)
-            })
-            un = prarr
+        let nets = [...new Set(u.map(e => e.usrnets).reduce((a, c) => a.concat(c)).map(e => parseInt(e)))]
+        let sortedIncNets = nets.sort((a, b) => {
+          if (a > b) {
+            return 1
           }
-          if (e.length === 1) {
-            un = [{
-              type: 'networks',
-              id: parseInt(e[0].customernetworkid)
-            }]
-            delete e[0].customernetworkid
-            un[0].attributes = e
+          if (a < b) {
+            return -1
           }
-          if (e.length === 0) {
-            un = []
-          }
-          return un
+          return 0
         })
+        incNets = sortedIncNets
       }
-      jsonarr = u.map((e, i) => {
+      // console.log(incNets)
+      jsonarr = u.map((e) => {
         jsonobj = {
           type: 'users',
           id: e.administratorid,
           links: {
-            self: url + e.administratorid
+            self: `${url}${e.administratorid}`
           }
         }
         if (isQueried) {
           jsonobj.relationships = {
             networks: {
               links: {
-                self: url + e.administratorid + '/relationships/networks',
-                related: url + e.administratorid + '/networks'
+                self: `${url}${e.administratorid}/relationships/networks`,
+                related: `${url}${e.administratorid}/networks`
               },
-              data: usernets[i].map((e) => { return { type: e.type, id: e.id } })
+              data: e.usrnets.map((e) => { return {type: 'networks', id: e} })
             }
           }
         }
@@ -79,43 +57,25 @@ const getAllUsers = (req, res, next) => {
         jsonobj.attributes = e
         return jsonobj
       })
-      if (isQueried) {
-        return {
-          users: jsonarr,
-          inc: usernets.filter((e) => { return e.length > 1 })
-        }
-      } else {
-        return {
-          users: jsonarr
-        }
+      resObj = {
+        users: jsonarr
       }
+      if (isQueried) {
+        resObj.inc = incNets
+      }
+      return resObj
     })
   })
   .then((d) => {
-    if (isQueried) {
-      let inc = d.inc.reduce((a, b) => { return a.concat(b) })
-      let mapped = inc.map((e, i) => {
-        return { i: i, value: e.id }
-      })
-      mapped.sort((a, b) => {
-        if (a.value > b.value) {
-          return 1
-        }
-        if (a.value < b.value) {
-          return -1
-        }
-        return 0
-      })
-      let sortinc = mapped.map((e) => {
-        return inc[e.i]
-      })
-      var uniq = sortinc.filter((item, index, self) => { return self.findIndex((obj) => { return obj.id === item.id }) === index })
-    }
+    console.log(d)
+    // if (isQueried) {
+    //   let uniq = []
+    // }
     res.status(200)
     if (isQueried) {
       res.json({
         data: d.users,
-        included: uniq
+        included: d.inc
       })
     } else {
       res.json({
@@ -152,7 +112,6 @@ const getOneUser = (req, res, next) => {
       let un = []
       if (isQueried) {
         const n = args[1]
-        console.log(args)
         n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
           e.customerid = parseInt(e.customerid)
@@ -183,15 +142,15 @@ const getOneUser = (req, res, next) => {
         type: 'users',
         id: u.administratorid,
         links: {
-          self: url + u.administratorid
+          self: `${url}${u.administratorid}`
         }
       }
       if (isQueried) {
         jsonobj.relationships = {
           networks: {
             links: {
-              self: url + u.administratorid + '/relationships/networks',
-              related: url + u.administratorid + '/networks'
+              self: `${url}${u.administratorid}/relationships/networks`,
+              related: `${url}${u.administratorid}/networks`
             },
             data: un.map((e) => { return { type: e.type, id: e.id } })
           }
@@ -262,7 +221,7 @@ const getUserNetworks = (req, res, next) => {
       res.status(200)
       .json({
         links: {
-          self: url + req.params.userid + '/networks'
+          self: `${url}${req.params.userid}/networks`
         },
         data: prarr
       })
@@ -286,7 +245,7 @@ const updateUser = (req, res, next) => {
   }
 
   if (req.body.netids !== null) {
-    netarr = '{' + req.body.netids.join() + '}'
+    netarr = `{${req.body.netids.join()}}`
     sqlUpdateUser += 'networks = $(netids), '
   }
 
@@ -317,7 +276,7 @@ const updateUser = (req, res, next) => {
       .json({
         meta: {
           status: 'success',
-          message: 'User ' + req.params.userid + ' modified'
+          message: `User ${req.params.userid} modified`
         }
       })
     })
