@@ -139,50 +139,33 @@ const getOneUser = (req, res, next) => {
   }
   db.foddb.tx((t) => {
     let txs = []
-    const users = t.one(sqlOneUser, {userid: req.params.userid}).then((user) => {
-      return user
-    })
+    const users = t.one(sqlOneUser, {userid: req.params.userid})
+    .then(user => user)
     txs.push(users)
     if (isQueried) {
-      const usernet = users.then((user) => {
-        let networks = t.any(sqlUserNetworks, {userid: user.uuid_administratorid})
-        return networks
-      })
-      txs.push(usernet)
+      let networks = t.any(sqlUserNetworks, {userid: req.params.userid})
+        .then(networks => networks)
+      txs.push(networks)
     }
     return db.promise.all(txs).then((args) => {
       const u = args[0]
+      let un = []
       if (isQueried) {
-        var un = []
-        const n = args[1]
+        const n = args[0].usrnets
+        console.log(args)
         n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
           e.customerid = parseInt(e.customerid)
           e.administratorid = e.administratorid
         })
         if (n.length > 1) {
-          let prarr = []
-          n.map((e) => {
-            let nobj = {
-              type: 'networks',
-              id: e.customernetworkid
-            }
-            delete e.customernetworkid
-            nobj.attributes = e
-            prarr.push(nobj)
-          })
-          un = prarr
+          un = n.map((e) => { return { type: 'networks', id: e } })
         }
         if (n.length === 1) {
-          un = [{
+          un.push({
             type: 'networks',
-            id: n[0].customernetworkid
-          }]
-          delete n[0].customernetworkid
-          un[0].attributes = n[0]
-        }
-        if (n.length === 0) {
-          un = []
+            id: n[0]
+          })
         }
       }
       jsonobj = {

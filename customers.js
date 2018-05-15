@@ -1,6 +1,6 @@
   const db = require('./db')
-  const courl = db.serveUrl + '/customers/'
-  const neturl = db.serveUrl + '/networks/'
+  const courl = `${db.serveUrl}/customers/`
+  const neturl = `${db.serveUrl}/networks/`
 
   const getAllCustomers = (req, res, next) => {
   /*
