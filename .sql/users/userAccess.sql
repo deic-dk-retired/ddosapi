@@ -1,7 +1,7 @@
 SELECT
-  f.administratorid
-, f.uuid_administratorid
+  f.uuid_administratorid "administratorid"
 , c.companyname
+, c.uuid_customerid "coid"
 , f.kind
 , f.name
 , f.username

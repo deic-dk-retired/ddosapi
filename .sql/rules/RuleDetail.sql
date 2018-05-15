@@ -2,7 +2,7 @@ select distinct
   flowspecruleid "ruleid",
   f.customerid "custid",
   rule_name "rulename",
-  f.administratorid "adminid",
+  f.uuid_administratorid "useruuid",
   a.name "admname",
   direction "direction",
   validfrom,
@@ -24,7 +24,7 @@ select distinct
   action
 FROM flow.flowspecrules AS f
 RIGHT OUTER JOIN flow.administrators AS a
-ON f.administratorid = a.administratorid
+ON f.uuid_administratorid = a.uuid_administratorid
 where ipprotocol = ${prot}
 and destinationprefix = ${dest}
 and action = ${action}

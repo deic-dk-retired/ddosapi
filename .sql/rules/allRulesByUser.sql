@@ -1,4 +1,5 @@
-SELECT distinct
+select r.* from
+(SELECT distinct
 f.flowspecruleid "id",
 f.uuid_flowspecruleid "ruleuuid",
 f.uuid_customerid "couuid",
@@ -22,7 +23,7 @@ icmpcode,
 icmptype,
 tcpflags,
 destinationport "destport",
-sourceport "srcportt",
+sourceport "srcport",
 packetlength "pktlen",
 fragmentencoding "fragenc",
 description,
@@ -34,4 +35,8 @@ where f.flowspecruleid in
   FROM flow.flowspecrules AS x
   WHERE coalesce(srcordestport,'') = coalesce(destinationport,'')
 )
-and flowspecruleid = ${id}
+and f.uuid_administratorid = ${userid}
+order by validfrom desc
+offset ${next}
+limit ${rows}) r
+order by validfrom desc

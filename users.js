@@ -18,7 +18,7 @@ const getAllUsers = (req, res, next) => {
     txs.push(prUsers)
     if (isQueried) {
       const prUsersNet = prUsers.map((u) => {
-        const networks = t.any(sqlUserNetworks, {userid: u.administratorid})
+        const networks = t.any(sqlUserNetworks, {userid: u.uuid_administratorid})
         return networks
       })
       txs.push(prUsersNet)
@@ -59,7 +59,7 @@ const getAllUsers = (req, res, next) => {
       jsonarr = u.map((e, i) => {
         jsonobj = {
           type: 'users',
-          id: parseInt(e.administratorid),
+          id: e.administratorid,
           links: {
             self: url + e.administratorid
           }
@@ -145,7 +145,7 @@ const getOneUser = (req, res, next) => {
     txs.push(users)
     if (isQueried) {
       const usernet = users.then((user) => {
-        let networks = t.any(sqlUserNetworks, {userid: user.administratorid})
+        let networks = t.any(sqlUserNetworks, {userid: user.uuid_administratorid})
         return networks
       })
       txs.push(usernet)
@@ -158,7 +158,7 @@ const getOneUser = (req, res, next) => {
         n.forEach((e) => {
           e.customernetworkid = parseInt(e.customernetworkid)
           e.customerid = parseInt(e.customerid)
-          e.administratorid = parseInt(e.administratorid)
+          e.administratorid = e.administratorid
         })
         if (n.length > 1) {
           let prarr = []
@@ -245,6 +245,8 @@ const getUserNetworks = (req, res, next) => {
             id: parseInt(e.customernetworkid)
           }
           delete e.customernetworkid
+          delete e.networks
+          delete e.administratorid
           probj.attributes = e
           prarr.push(probj)
         })
@@ -255,6 +257,8 @@ const getUserNetworks = (req, res, next) => {
           id: parseInt(data[0].customernetworkid)
         }
         delete data[0].customernetworkid
+        delete data[0].networks
+        delete data[0].administratorid
         probj.attributes = data[0]
         prarr = probj
       }
@@ -298,11 +302,11 @@ const updateUser = (req, res, next) => {
 
   sqlUpdateUser = sqlUpdateUser.substr(0, sqlUpdateUser.length - 2)
 
-  if (req.body.useruuid !== '') {
-    sqlUpdateUser += ' WHERE uuid_administratorid = $(useruuid) RETURNING *; COMMIT;'
+  if (req.params.userid !== '') {
+    sqlUpdateUser += ' WHERE uuid_administratorid = $(userid) RETURNING *; COMMIT;'
   }
 
-  // console.log(sqlUpdateUser)
+  console.log(sqlUpdateUser)
 //   uuid_customerid = $(couuid)
 // , customerid=$(coid)
 
@@ -311,9 +315,8 @@ const updateUser = (req, res, next) => {
       coid: parseInt(req.body.coid),
       kind: req.body.kind,
       netids: netarr,
-      useruuid: req.body.useruuid,
       valid: req.body.valid,
-      userid: parseInt(req.params.userid)
+      userid: req.params.userid
     })
     .then(() => {
       res.status(200)
