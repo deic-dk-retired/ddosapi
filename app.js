@@ -50,7 +50,7 @@ app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', index)
-// app.use(api, auth)
+app.use(api, auth)
 app.use(api, customers)
 app.use(api, fnm)
 app.use(api, icmps)

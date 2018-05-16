@@ -6,7 +6,7 @@ const getAllUsers = (req, res, next) => {
   const sqlUsersNetworks = db.miniQuery('.sql/users/usersNetworks.sql')
   let jsonarr = []
   let incNets = []
-  let jsonobj = {}
+  let jsonObj = {}
   let isQueried = false
   if (req.query.include === 'networks') {
     isQueried = true
@@ -22,20 +22,13 @@ const getAllUsers = (req, res, next) => {
       const u = args[0]
       if (isQueried) {
         let nets = [...new Set(u.map(e => e.usrnets).reduce((a, c) => a.concat(c)).map(e => parseInt(e)))]
-        let sortedIncNets = nets.sort((a, b) => {
-          if (a > b) {
-            return 1
-          }
-          if (a < b) {
-            return -1
-          }
-          return 0
-        })
-        incNets = sortedIncNets
+        let sortednets = nets.sort((a, b) => a - b)
+        let netspgarr = `{${sortednets.join()}}`
+        incNets = db.foddb.any(sqlUsersNetworks, {networkids: netspgarr})
+        .then(n => n)
       }
-      // console.log(incNets)
       jsonarr = u.map((e) => {
-        jsonobj = {
+        jsonObj = {
           type: 'users',
           id: e.administratorid,
           links: {
@@ -43,7 +36,7 @@ const getAllUsers = (req, res, next) => {
           }
         }
         if (isQueried) {
-          jsonobj.relationships = {
+          jsonObj.relationships = {
             networks: {
               links: {
                 self: `${url}${e.administratorid}/relationships/networks`,
@@ -54,8 +47,8 @@ const getAllUsers = (req, res, next) => {
           }
         }
         delete e.administratorid
-        jsonobj.attributes = e
-        return jsonobj
+        jsonObj.attributes = e
+        return jsonObj
       })
       resObj = {
         users: jsonarr
@@ -66,16 +59,36 @@ const getAllUsers = (req, res, next) => {
       return resObj
     })
   })
+  .then((o) => {
+    if (isQueried) {
+      return db.foddb.tx((t) => {
+        return db.promise.all(o.inc).then(n => n)
+      })
+      .then((n) => {
+        return {
+          users: o.users,
+          inc: n
+        }
+      })
+      .then(d => d)
+    } else {
+      return {
+        users: o.users
+      }
+    }
+  })
   .then((d) => {
-    console.log(d)
-    // if (isQueried) {
-    //   let uniq = []
-    // }
     res.status(200)
     if (isQueried) {
+      let inc = d.inc.map((e) => {
+        let no = {type: 'networks', id: e.customernetworkid}
+        delete e.customernetworkid
+        no.attributes = e
+        return no
+      })
       res.json({
         data: d.users,
-        included: d.inc
+        included: inc
       })
     } else {
       res.json({
@@ -92,7 +105,7 @@ const getAllUsers = (req, res, next) => {
 const getOneUser = (req, res, next) => {
   const sqlUserNetworks = db.miniQuery('.sql/users/userNetworks.sql')
   const sqlOneUser = db.miniQuery('.sql/users/oneUser.sql')
-  let jsonobj = {}
+  let jsonObj = {}
   let isQueried = false
   if (req.query.include === 'networks') {
     isQueried = true
@@ -138,7 +151,7 @@ const getOneUser = (req, res, next) => {
           un.push(nobj)
         }
       }
-      jsonobj = {
+      jsonObj = {
         type: 'users',
         id: u.administratorid,
         links: {
@@ -146,7 +159,7 @@ const getOneUser = (req, res, next) => {
         }
       }
       if (isQueried) {
-        jsonobj.relationships = {
+        jsonObj.relationships = {
           networks: {
             links: {
               self: `${url}${u.administratorid}/relationships/networks`,
@@ -157,11 +170,11 @@ const getOneUser = (req, res, next) => {
         }
       }
       delete u.administratorid
-      jsonobj.attributes = u
+      jsonObj.attributes = u
       if (isQueried) {
-        return {user: jsonobj, inc: un}
+        return {user: jsonObj, inc: un}
       } else {
-        return {user: jsonobj}
+        return {user: jsonObj}
       }
     })
   })
