@@ -1,4 +1,4 @@
-select
+select distinct
   c.customernetworkid,
   c.uuid_customernetworkid "netuuid",
   c.customerid,

@@ -22,10 +22,7 @@ const getAllUsers = (req, res, next) => {
       const u = args[0]
       if (isQueried) {
         let nets = [...new Set(u.map(e => e.usrnets).reduce((a, c) => a.concat(c)).map(e => parseInt(e)))]
-        let sortednets = nets.sort((a, b) => a - b)
-        let netspgarr = `{${sortednets.join()}}`
-        incNets = db.foddb.any(sqlUsersNetworks, {networkids: netspgarr})
-        .then(n => n)
+        incNets = nets.sort((a, b) => a - b)
       }
       jsonarr = u.map((e) => {
         jsonObj = {
@@ -61,16 +58,14 @@ const getAllUsers = (req, res, next) => {
   })
   .then((o) => {
     if (isQueried) {
-      return db.foddb.tx((t) => {
-        return db.promise.all(o.inc).then(n => n)
-      })
+      return db.foddb.any(sqlUsersNetworks, {networkids: `{${o.inc.join()}}`})
+      // .tap(d => console.log(d))
       .then((n) => {
         return {
           users: o.users,
           inc: n
         }
       })
-      .then(d => d)
     } else {
       return {
         users: o.users
