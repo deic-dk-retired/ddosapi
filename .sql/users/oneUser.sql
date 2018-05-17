@@ -14,7 +14,7 @@ SELECT
 , coalesce(f.lastpasswordchange, now()) "lastpasswordchange"
 , f.networks "usrnets"
 FROM flow.administrators f
-LEFT JOIN flow.customers c
+JOIN flow.customers c
 ON f.customerid = c.customerid
 WHERE f.uuid_administratorid = $(userid)
 -- AND f.valid = 'active'

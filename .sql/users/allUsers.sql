@@ -14,7 +14,7 @@
 , coalesce(f.lastpasswordchange, now() - interval '2 years') "lastpasswordchange"
 , f.networks "usrnets"
 FROM flow.administrators as f
-LEFT JOIN flow.customers c
+JOIN flow.customers c
 ON f.customerid = c.customerid
 ORDER BY lastlogin DESC
 

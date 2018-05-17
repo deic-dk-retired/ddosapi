@@ -11,7 +11,7 @@ SELECT
 , coalesce(f.lastlogin, now()) "lastlogin"
 , coalesce(f.lastpasswordchange, now()) "lastpasswordchange"
 FROM flow.administrators f
-LEFT JOIN flow.customers c
+JOIN flow.customers c
 ON f.customerid = c.customerid
 WHERE f.username = $(username)
 
