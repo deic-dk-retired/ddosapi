@@ -4,8 +4,7 @@ const neturl = `${db.serveUrl}/networks/`
 
 const getAllCustomers = (req, res, next) => {
   const sqlAllCustomers = db.miniQuery('.sql/customers/allCustomers.sql')
-  const sqlCosNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
-  let jsonarr = []
+  const sqlCosNetworks = db.miniQuery('.sql/customers/customersNetworks.sql')
   let incNets = []
   let jsonObj = {}
   let isQueried = false
@@ -13,33 +12,88 @@ const getAllCustomers = (req, res, next) => {
     isQueried = true
   }
 
-  db.foddb.any(sqlAllCustomers)
-  .then((data) => {
-    // let jsonarr = []
-    // let jsonobj
-    data.map((e) => {
-      jsonObj = {
-        type: 'customers',
-        id: parseInt(e.customerid),
-        links: {
-          self: `${url}${e.customerid}`
+  db.foddb.tx((t) => {
+    let resObj = {}
+    let txs = []
+    const prCos = t.any(sqlAllCustomers)
+      .then(cos => cos)
+    txs.push(prCos)
+
+    return db.promise.all(txs).then((args) => {
+      const u = args[0]
+      let jsonarr = []
+      if (isQueried) {
+        let nets = [...new Set(u.map(e => e.conets).reduce((a, c) => a.concat(c)).map(e => parseInt(e)))]
+        incNets = nets.sort((a, b) => a - b)
+      }
+      jsonarr = u.map((e) => {
+        jsonObj = {
+          type: 'customers',
+          id: e.customerid,
+          links: {
+            self: `${url}${e.customerid}`
+          }
         }
+        if (isQueried) {
+          jsonObj.relationships = {
+            networks: {
+              links: {
+                self: `${url}${e.customerid}/relationships/networks`,
+                related: `${url}${e.customerid}/networks`
+              },
+              data: e.conets.map((e) => { return {type: 'networks', id: e} })
+            }
+          }
+        }
+        delete e.customerid
+        jsonObj.attributes = e
+        return jsonObj
+      })
+      resObj = {
+        customers: jsonarr
       }
-      delete e.customerid
-      jsonObj.attributes = e
-      jsonarr.push(jsonObj)
-    })
-    res.status(200)
-    .json({
-      data: jsonarr,
-      meta: {
-        status: 'OK',
-        total: data.length
+      if (isQueried) {
+        resObj.inc = incNets
       }
+      return resObj
     })
   })
+  .then((o) => {
+    if (isQueried) {
+      return db.foddb.any(sqlCosNetworks, {networkids: `{${o.inc.join()}}`})
+      .then((n) => {
+        return {
+          customers: o.customers,
+          inc: n
+        }
+      })
+    } else {
+      return {
+        customers: o.customers
+      }
+    }
+  })
+  .then((d) => {
+    res.status(200)
+    if (isQueried) {
+      let inc = d.inc.map((e) => {
+        let no = {type: 'networks', id: e.customernetworkid}
+        delete e.customernetworkid
+        no.attributes = e
+        return no
+      })
+      res.json({
+        data: d.customers,
+        included: inc
+      })
+    } else {
+      res.json({
+        data: d.customers
+      })
+    }
+  })
   .catch((err) => {
-    console.error(err.stack)
+    console.log(err.stack)
     return next(err.message)
   })
 }
@@ -54,11 +108,11 @@ const getOneCustomer = (req, res, next) => {
   }
   db.foddb.tx((t) => {
     let txs = []
-    const customer = t.one(sqlOneCustomer, {customerid: req.params.customerid})
+    const customer = t.one(sqlOneCustomer, {customerid: req.params.coid})
     .then(customer => customer)
     txs.push(customer)
     if (isQueried) {
-      let networks = t.any(sqlCosNetworks, {customerid: req.params.customerid})
+      let networks = t.any(sqlCosNetworks, {customerid: req.params.coid})
         .then(networks => networks)
       txs.push(networks)
     }
@@ -82,10 +136,11 @@ const getOneCustomer = (req, res, next) => {
         if (n.length === 1) {
           let nobj = {
             type: 'networks',
-            id: n[0]
+            id: n[0].customernetworkid
           }
           delete n[0].customernetworkid
           nobj.attributes = n[0]
+          console.log(nobj)
           cn.push(nobj)
         }
       }
@@ -169,7 +224,7 @@ const getAllNetworks = (req, res, next) => {
 
 const getCustomerNetworks = (req, res, next) => {
   const sqlCustomerNetworks = db.miniQuery('.sql/customers/customerNetworks.sql')
-  db.foddb.any(sqlCustomerNetworks, {customerid: req.params.customerid})
+  db.foddb.any(sqlCustomerNetworks, {customerid: req.params.coid})
   .then((data) => {
     let prarr = []
     let probj = {}
@@ -201,7 +256,7 @@ const getCustomerNetworks = (req, res, next) => {
     res.status(200)
     .json({
       links: {
-        self: `${url}${req.params.customerid}/networks`
+        self: `${url}${req.params.coid}/networks`
       },
       data: prarr
     })
@@ -338,14 +393,29 @@ const createNetwork = (req, res, next) => {
 }
 
 const removeNetwork = (req, res, next) => {
-  const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteCustomerNetwork.sql')
-  db.foddb.none(sqlRemoveNetwork, {netid: parseInt(req.params.netid)})
-  .then(() => {
+  const sqlUpdateCoNetwork = db.miniQuery('.sql/customers/updateCustomerNetwork.sql')
+  const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteNetwork.sql')
+  console.log(req.params.coid)
+  console.log(req.body.netid)
+  db.foddb.tx((t) => {
+    let txs = []
+    const remCoNet = t.any(sqlUpdateCoNetwork,
+      {
+        coid: parseInt(req.params.coid),
+        netid: parseInt(req.body.netid)
+      }).then(c => c)
+    txs.push(remCoNet)
+    const remNet = t.any(sqlRemoveNetwork, {netid: parseInt(req.body.netid)})
+      .then(c => c)
+    txs.push(remNet)
+    return db.promise.all(txs).then(args => args)
+  })
+  .then((d) => {
     res.status(200)
     .json({
       meta: {
-        status: 'OK',
-        message: 'successfully removed network'
+        status: `200`,
+        message: `successfully removed network`
       }
     })
   })
@@ -353,6 +423,21 @@ const removeNetwork = (req, res, next) => {
     console.error(err.stack)
     return next(err.message)
   })
+
+  // db.foddb.none(sqlRemoveCoNetwork, {netid: parseInt(req.params.netid)})
+  // .then(() => {
+  //   res.status(200)
+  //   .json({
+  //     meta: {
+  //       status: 'OK',
+  //       message: 'successfully removed network'
+  //     }
+  //   })
+  // })
+  // .catch((err) => {
+  //   console.error(err.stack)
+  //   return next(err.message)
+  // })
 }
 
 const customers = {

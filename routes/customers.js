@@ -8,11 +8,11 @@ map urls to functions
 for customers
 */
 openRouter.get('/customers', customers.getAllCustomers)
-openRouter.get('/customers/:customerid', customers.getOneCustomer)
+openRouter.get('/customers/:coid', customers.getOneCustomer)
 openRouter.post('/customers', customers.createCustomer)
 openRouter.delete('/customers/:coid', customers.removeCustomer)
-openRouter.get('/customers/:customerid/relationships/networks', customers.getCustomerNetworks)
-openRouter.get('/customers/:customerid/networks', customers.getCustomerNetworks)
+openRouter.get('/customers/:coid/relationships/networks', customers.getCustomerNetworks)
+openRouter.get('/customers/:coid/networks', customers.getCustomerNetworks)
 openRouter.get('/networks', customers.getAllNetworks)
 openRouter.post('/networks', customers.createNetwork)
 openRouter.delete('/networks/:netid', customers.removeNetwork)
