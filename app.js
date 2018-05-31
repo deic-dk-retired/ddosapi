@@ -19,7 +19,6 @@ const stats = require(`${route}stats`)
 const app = express()
 const api = `/${process.env.RU_NAMESPACE}`
 
-// app.disable('x-powered-by')
 app.use(helmet.dnsPrefetchControl())
 app.use(helmet.frameguard())
 app.use(helmet.hidePoweredBy())
@@ -42,9 +41,7 @@ app.use(function (req, res, next) {
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
-// log to console
 app.use(morgan('dev'))
-// get req params
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
@@ -76,7 +73,6 @@ app.use(function (req, res, next) {
 })
 
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {

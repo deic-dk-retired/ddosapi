@@ -1,10 +1,9 @@
 const db = require('./db')
-const url = db.serveUrl + '/users/'
+const url = `${db.serveUrl}/users/`
 
 const getAllUsers = (req, res, next) => {
   const sqlAllUsers = db.miniQuery('.sql/users/allUsers.sql')
   const sqlUsersNetworks = db.miniQuery('.sql/users/usersNetworks.sql')
-  let jsonarr = []
   let incNets = []
   let jsonObj = {}
   let isQueried = false
@@ -20,6 +19,7 @@ const getAllUsers = (req, res, next) => {
 
     return db.promise.all(txs).then((args) => {
       const u = args[0]
+      let jsonarr = []
       if (isQueried) {
         let nets = [...new Set(u.map(e => e.usrnets).reduce((a, c) => a.concat(c)).map(e => parseInt(e)))]
         incNets = nets.sort((a, b) => a - b)
@@ -59,7 +59,6 @@ const getAllUsers = (req, res, next) => {
   .then((o) => {
     if (isQueried) {
       return db.foddb.any(sqlUsersNetworks, {networkids: `{${o.inc.join()}}`})
-      // .tap(d => console.log(d))
       .then((n) => {
         return {
           users: o.users,
@@ -139,7 +138,7 @@ const getOneUser = (req, res, next) => {
         if (n.length === 1) {
           let nobj = {
             type: 'networks',
-            id: n[0]
+            id: n[0].customernetworkid
           }
           delete n[0].customernetworkid
           nobj.attributes = n[0]

@@ -360,57 +360,103 @@ const removeCustomer = (req, res, next) => {
 
 const createNetwork = (req, res, next) => {
   const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
-  db.foddb.one(sqlCreateNetwork,
-    { netuuid: req.body.netuuid,
+  const sqlAddCoNetwork = db.miniQuery('.sql/customers/addCustomerNetwork.sql')
+
+  db.foddb.tx((t) => {
+    let txs = []
+    const addedNet = t.one(sqlCreateNetwork, {
+      netuuid: req.body.netuuid,
       couuid: req.body.couuid,
       coid: parseInt(req.body.coid),
       netname: req.body.netname,
       netkind: req.body.netkind,
       netaddr: req.body.netaddr,
       netdesc: req.body.netdesc
-    })
+    }).then(n => n)
+    txs.push(addedNet)
+    return db.promise.all(txs).then(args => args)
+  })
+  .then((r) => {
+    const sqlCoNets =
+    `select networks
+      from flow.customers a
+      where a.customerid = $(coid);`
+    const getCoNets = t.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
+    txs.push(getCoNets)
+
+    const updateCoNets = t.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `{${getCoNets}}`})
+    txs.push(updateCoNets)
+  })
   .then((d) => {
-    var jsonobj
-    jsonobj = {
+    console.log(d)
+    let jsonObj = {
       type: 'networks',
       id: parseInt(d.customernetworkid)
     }
     delete d.customernetworkid
-    jsonobj.attributes = d
+    jsonObj.attributes = d
     res.status(201)
     .json({
-      data: jsonobj,
+      data: jsonObj,
       meta: {
         status: 'OK',
-        message: `Successfully created network ${jsonobj.attributes.name}`
+        message: `Successfully created network ${jsonObj.attributes.name}`
       }
     })
   })
   .catch((err) => {
-    console.error(err.stack)
+    console.log(err.stack)
     return next(err.message)
   })
+
+  // db.foddb.one(sqlCreateNetwork,
+  //   { netuuid: req.body.netuuid,
+  //     couuid: req.body.couuid,
+  //     coid: parseInt(req.body.coid),
+  //     netname: req.body.netname,
+  //     netkind: req.body.netkind,
+  //     netaddr: req.body.netaddr,
+  //     netdesc: req.body.netdesc
+  //   })
+  // .then((d) => {
+  //   let jsonObj = {
+  //     type: 'networks',
+  //     id: parseInt(d.customernetworkid)
+  //   }
+  //   delete d.customernetworkid
+  //   jsonObj.attributes = d
+  //   res.status(201)
+  //   .json({
+  //     data: jsonObj,
+  //     meta: {
+  //       status: 'OK',
+  //       message: `Successfully created network ${jsonObj.attributes.name}`
+  //     }
+  //   })
+  // })
+  // .catch((err) => {
+  //   console.error(err.stack)
+  //   return next(err.message)
+  // })
 }
 
 const removeNetwork = (req, res, next) => {
-  const sqlUpdateCoNetwork = db.miniQuery('.sql/customers/updateCustomerNetwork.sql')
+  const sqlUpdateCoNetwork = db.miniQuery('.sql/customers/removeCustomerNetwork.sql')
   const sqlRemoveNetwork = db.miniQuery('.sql/customers/deleteNetwork.sql')
   console.log(req.params.coid)
   console.log(req.body.netid)
   db.foddb.tx((t) => {
     let txs = []
     const remCoNet = t.any(sqlUpdateCoNetwork,
-      {
-        coid: parseInt(req.params.coid),
-        netid: parseInt(req.body.netid)
-      }).then(c => c)
+      {coid: parseInt(req.params.coid), netid: parseInt(req.body.netid)}).then(c => c)
     txs.push(remCoNet)
     const remNet = t.any(sqlRemoveNetwork, {netid: parseInt(req.body.netid)})
       .then(c => c)
     txs.push(remNet)
-    return db.promise.all(txs).then(args => args)
+    return db.promise.all(txs).then(res => res)
   })
   .then((d) => {
+    console.log(d)
     res.status(200)
     .json({
       meta: {
