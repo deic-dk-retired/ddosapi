@@ -376,33 +376,49 @@ const createNetwork = (req, res, next) => {
     txs.push(addedNet)
     return db.promise.all(txs).then(args => args)
   })
-  .then((r) => {
+  // .then((r) => {
+  //   const sqlCoNets =
+  //   `select networks
+  //     from flow.customers a
+  //     where a.customerid = $(coid);`
+  //   const getCoNets = t.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
+  //   txs.push(getCoNets)
+
+  //   const updateCoNets = t.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `{${getCoNets}}`})
+  //   txs.push(updateCoNets)
+  // })
+  .then((d) => {
+    console.log(d)
     const sqlCoNets =
-    `select networks
+    `select networks, ${d[0].customernetworkid} "nnet", '${d[0].name}' "nname"
       from flow.customers a
       where a.customerid = $(coid);`
-    const getCoNets = t.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
-    txs.push(getCoNets)
-
-    const updateCoNets = t.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `{${getCoNets}}`})
-    txs.push(updateCoNets)
+    return db.foddb.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
   })
   .then((d) => {
     console.log(d)
-    let jsonObj = {
-      type: 'networks',
-      id: parseInt(d.customernetworkid)
-    }
-    delete d.customernetworkid
-    jsonObj.attributes = d
-    res.status(201)
-    .json({
-      data: jsonObj,
-      meta: {
-        status: 'OK',
-        message: `Successfully created network ${jsonObj.attributes.name}`
-      }
-    })
+    const newCoNets = d.networks
+    newCoNets.push(d.nnet)
+    newCoNets.sort((p, q) => p - q)
+    const sortedNetList = `{${newCoNets.join()}}`
+    return db.foddb.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `${sortedNetList}`})
+  })
+  .then((d) => {
+    console.log(d)
+    // let jsonObj = {
+    //   type: 'networks',
+    //   id: parseInt(d.customernetworkid)
+    // }
+    // delete d.customernetworkid
+    // jsonObj.attributes = d
+    // res.status(201)
+    // .json({
+    //   data: jsonObj,
+    //   meta: {
+    //     status: 'OK',
+    //     message: `Successfully created network ${jsonObj.attributes.name}`
+    //   }
+    // })
   })
   .catch((err) => {
     console.log(err.stack)
