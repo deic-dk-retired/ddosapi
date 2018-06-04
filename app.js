@@ -29,7 +29,7 @@ app.use(helmet.xssFilter())
 
 app.use(compression())
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, jwtauthtkn')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, ddpsauthtkn')
   res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
   res.header('Access-Control-Allow-Origin', req.headers.origin)
   res.header('Content-Type', 'application/vnd.api+json')
