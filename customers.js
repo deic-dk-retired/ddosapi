@@ -361,7 +361,7 @@ const removeCustomer = (req, res, next) => {
 const createNetwork = (req, res, next) => {
   const sqlCreateNetwork = db.miniQuery('.sql/customers/createNetwork.sql')
   const sqlAddCoNetwork = db.miniQuery('.sql/customers/addCustomerNetwork.sql')
-
+  let newNetid = null
   db.foddb.tx((t) => {
     let txs = []
     const addedNet = t.one(sqlCreateNetwork, {
@@ -374,86 +374,53 @@ const createNetwork = (req, res, next) => {
       netdesc: req.body.netdesc
     }).then(n => n)
     txs.push(addedNet)
-    return db.promise.all(txs).then(args => args)
-  })
-  // .then((r) => {
-  //   const sqlCoNets =
-  //   `select networks
-  //     from flow.customers a
-  //     where a.customerid = $(coid);`
-  //   const getCoNets = t.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
-  //   txs.push(getCoNets)
-
-  //   const updateCoNets = t.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `{${getCoNets}}`})
-  //   txs.push(updateCoNets)
-  // })
-  .then((d) => {
-    console.log(d)
-    const sqlCoNets =
-    `select networks, ${d[0].customernetworkid} "nnet", '${d[0].name}' "nname"
+    const selCoNetList = t.tx((t1) => {
+      const sqlCoNets =
+      `select networks
       from flow.customers a
       where a.customerid = $(coid);`
-    return db.foddb.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
+      return t1.one(sqlCoNets, {coid: parseInt(req.body.coid)}).then(d => d)
+    })
+    txs.push(selCoNetList)
+    return db.promise.all(txs).then(d => d)
   })
   .then((d) => {
-    console.log(d)
-    const newCoNets = d.networks
-    newCoNets.push(d.nnet)
+    const newCoNets = d[1].networks
+    newNetid = parseInt(d[0].customernetworkid)
+    newCoNets.push(newNetid)
     newCoNets.sort((p, q) => p - q)
     const sortedNetList = `{${newCoNets.join()}}`
-    return db.foddb.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `${sortedNetList}`})
+    return db.foddb.one(sqlAddCoNetwork, {coid: parseInt(req.body.coid), netarr: `${sortedNetList}`}).then(d => d)
   })
   .then((d) => {
-    console.log(d)
-    // let jsonObj = {
-    //   type: 'networks',
-    //   id: parseInt(d.customernetworkid)
-    // }
-    // delete d.customernetworkid
-    // jsonObj.attributes = d
-    // res.status(201)
-    // .json({
-    //   data: jsonObj,
-    //   meta: {
-    //     status: 'OK',
-    //     message: `Successfully created network ${jsonObj.attributes.name}`
-    //   }
-    // })
+    const sqlNewNet =
+      `select *
+      from flow.customernetworks a
+      where a.customerid = $(coid)
+      and customernetworkid = $(netid);`
+    return db.foddb.one(sqlNewNet, {coid: parseInt(req.body.coid), netid: newNetid}).then(d => d)
+  })
+  .then((d) => {
+    // console.log(d)
+    let jsonObj = {
+      type: 'networks',
+      id: parseInt(d.customernetworkid)
+    }
+    delete d.customernetworkid
+    jsonObj.attributes = d
+    res.status(201)
+    .json({
+      data: jsonObj,
+      meta: {
+        status: 'OK',
+        message: `Successfully created network ${jsonObj.attributes.name}`
+      }
+    })
   })
   .catch((err) => {
     console.log(err.stack)
     return next(err.message)
   })
-
-  // db.foddb.one(sqlCreateNetwork,
-  //   { netuuid: req.body.netuuid,
-  //     couuid: req.body.couuid,
-  //     coid: parseInt(req.body.coid),
-  //     netname: req.body.netname,
-  //     netkind: req.body.netkind,
-  //     netaddr: req.body.netaddr,
-  //     netdesc: req.body.netdesc
-  //   })
-  // .then((d) => {
-  //   let jsonObj = {
-  //     type: 'networks',
-  //     id: parseInt(d.customernetworkid)
-  //   }
-  //   delete d.customernetworkid
-  //   jsonObj.attributes = d
-  //   res.status(201)
-  //   .json({
-  //     data: jsonObj,
-  //     meta: {
-  //       status: 'OK',
-  //       message: `Successfully created network ${jsonObj.attributes.name}`
-  //     }
-  //   })
-  // })
-  // .catch((err) => {
-  //   console.error(err.stack)
-  //   return next(err.message)
-  // })
 }
 
 const removeNetwork = (req, res, next) => {
