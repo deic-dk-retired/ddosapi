@@ -10,6 +10,5 @@ select
 from flow.customers a
 join flow.customernetworks c
 on c.customernetworkid = any(a.networks)
-where a.customerid = $(customerid)
-and c.customernetworkid = ANY(a.networks::int[])
+where c.customernetworkid = ANY($(networkids)::int[])
 order by c.customernetworkid, a.customerid asc

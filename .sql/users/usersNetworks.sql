@@ -10,6 +10,5 @@ select distinct
 from flow.administrators a
 join flow.customernetworks c
 on c.customernetworkid = any(a.networks)
-and a.uuid_administratorid = $(userid)
-and c.customernetworkid = ANY(a.networks::int[])
+and c.customernetworkid = ANY($(networkids)::int[])
 order by c.customernetworkid, c.customerid asc;

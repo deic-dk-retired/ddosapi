@@ -1,3 +1,9 @@
+/**
+ * create network record in
+ * customernetworks table
+ * This is list of all networks
+ * for every customer
+ */
 INSERT INTO flow.customernetworks
 ( uuid_customernetworkid,
   uuid_customerid,

@@ -1,3 +1,6 @@
+/**
+ * query all the networks
+ */
 select
   customernetworkid,
   uuid_customernetworkid "netuuid",
