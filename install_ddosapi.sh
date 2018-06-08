@@ -43,6 +43,7 @@ bash nodesource_setup.sh
 apt-get -y install nodejs build-essential
 
 # clone pm2 deploy scripts in tmp
+# from https://gist.github.com/ashokaditya/a2132e9f8103f8df1b4fb9dc55af6428
 # move ecosystem.json to /opt/deploy-ddos
 git clone https://gist.github.com/a2132e9f8103f8df1b4fb9dc55af6428.git
 mv a2132e9f8103f8df1b4fb9dc55af6428 eco
