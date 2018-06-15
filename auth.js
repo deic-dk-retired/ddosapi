@@ -8,13 +8,11 @@ const authenticate = (req, res, next) => {
   const verUsername = db.miniQuery('.sql/users/isUser.sql')
   const verActiveUser = db.miniQuery('.sql/users/userStatus.sql')
   const updateLastLogin = db.miniQuery('.sql/users/updateLastLogin.sql')
-
-  let id = crptojs.decrypt(req.body, process.env.SU_SEC_3SHA512, {
+  const id = crptojs.decrypt(req.body, process.env.SU_SEC_3SHA512, {
     algorithm: 'aes256',
     encoding: 'hex'
   })
-
-  let ttoexp = '2h'
+  const ttoexp = '2h'
 
   db.foddb.any(verUsername, {username: id.un})
   .then((d) => {
@@ -31,9 +29,8 @@ const authenticate = (req, res, next) => {
           return db.foddb.any(sqlUserAccess, {username: id.un, password: id.ke})
           .then((d) => { // password matches
             if (d[0].hasAccess) {
-              // update lastlogin time
-              db.foddb.any(updateLastLogin, {username: d[0].username})
-              let payload = {
+              // create payload
+              const payload = {
                 ddpsEng: 'fastnetmon',
                 clnt: req.ip,
                 userid: d[0].administratorid,
@@ -46,7 +43,8 @@ const authenticate = (req, res, next) => {
               if (d[0].kind !== 'globaladmin') {
                 payload.coid = d[0].coid
               }
-              let token = jwt.sign(payload, process.env.SU_SEC, {
+              // sign payload with time to expire
+              const token = jwt.sign(payload, process.env.SU_SEC, {
                 expiresIn: ttoexp,
                 algorithm: 'HS512',
                 issuer: process.env.SU_ISSUER
@@ -54,6 +52,7 @@ const authenticate = (req, res, next) => {
               delete payload.ddpsEng
               delete payload.userid
               delete payload.co
+              // set payload time to expire
               payload.texp = ttoexp
               res.status(200)
               .json({
@@ -70,6 +69,8 @@ const authenticate = (req, res, next) => {
                 status: '200',
                 message: 'Successfully logged in!'
               })
+              // update lastlogin time
+              return db.foddb.any(updateLastLogin, {username: d[0].username}).then(d => d)
             } else {
               res.status(401)
               .json({
