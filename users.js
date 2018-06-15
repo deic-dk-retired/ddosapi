@@ -266,9 +266,9 @@ const updateUser = (req, res, next) => {
     sqlUpdateUser += ' WHERE uuid_administratorid = $(userid) RETURNING *; COMMIT;'
   }
 
-  console.log(sqlUpdateUser)
-//   uuid_customerid = $(couuid)
-// , customerid=$(coid)
+  // console.log(sqlUpdateUser)
+  // uuid_customerid = $(couuid)
+  // , customerid=$(coid)
 
   db.foddb.any(sqlUpdateUser,
     { couuid: req.body.couuid,

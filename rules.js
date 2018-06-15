@@ -138,8 +138,8 @@ const createRule = (req, res, next) => {
       action: req.body.action
     })
     .then((d) => {
-      var jsonobj
-      jsonobj = {
+      console.log(d)
+      const jsonobj = {
         type: 'rules',
         id: parseInt(d[0].flowspecruleid)
       }
