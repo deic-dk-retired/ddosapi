@@ -20,7 +20,7 @@ const authenticate = (req, res, next) => {
       res.status(404)
       .json({
         status: '404',
-        message: 'no such username'
+        message: 'That username is either unreal or inactive!'
       })
     } else { // isUser
       return db.foddb.any(verActiveUser, {username: d[0].username})
@@ -67,7 +67,7 @@ const authenticate = (req, res, next) => {
                   }
                 }],
                 status: '200',
-                message: 'Successfully logged in!'
+                message: 'Awesome! Login successful!'
               })
               // update lastlogin time
               return db.foddb.any(updateLastLogin, {username: d[0].username}).then(d => d)
@@ -75,7 +75,7 @@ const authenticate = (req, res, next) => {
               res.status(401)
               .json({
                 status: '401',
-                message: 'Incorrect password!'
+                message: 'You might want to check that password again!'
               })
             }
           })
