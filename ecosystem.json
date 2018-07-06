@@ -1,0 +1,75 @@
+{
+  "apps": [
+    {
+      "name": "ddosapi",
+      "script": "bin/server.js",
+      "instances" : "max",
+      "exec_mode" : "cluster",
+      "env": {
+        "COMMON_VARIABLE": "true"
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      }
+    }
+  ],
+
+  /**
+   * Deployment section
+   * http://pm2.keymetrics.io/docs/usage/deployment/
+   */
+  "deploy": {
+    "production": {
+      "user": "hansolo",
+      "host": "localhost",
+      "ref": "origin/master",
+      "repo": "https://github.com/deic-dk/ddosapi.git",
+      "path": "/opt/ddosapi/pro-ddosapi",
+      "post-setup": "npm install; ls -la; pwd",
+      "pre-deploy": "pm2 startOrRestart /opt/deploy-ddosapi/ecosystem.json --env production",
+      "env": {
+        "SU_SEC": "",
+        "SU_SEC_3SHA512": "",
+        "SU_ISSUER": "",
+        "RU_HOST": "",
+        "RU_SERVER_PORT": "9090",
+        "RU_NAMESPACE": "ddosapi",
+        "RU_DBC": "postgres",
+        "RU_DB_VER": "9.5",
+        "RU_SCHEMA": "",
+        "RU_USER": "",
+        "RU_PWD": "",
+        "IF_HOST":"",
+        "IF_HOST_PORT":"8086",
+        "IF_SCHEMA": "",
+        "NODE_ENV": "production"
+      }
+    },
+    "development": {
+      "user": "hansolo",
+      "host": "localhost",
+      "ref": "origin/master",
+      "repo": "https://github.com/deic-dk/ddosapi.git",
+      "path": "/opt/ddosapi/dev-ddosapi",
+      "post-setup": "npm install; ls -la; pwd",
+      "pre-deploy": "pm2 startOrRestart /opt/deploy-ddosapi/ecosystem.json --env development",
+      "env": {
+        "SU_SEC": "",
+        "SU_SEC_3SHA512": "",
+        "SU_ISSUER": "",
+        "RU_HOST": "",
+        "RU_SERVER_PORT": "9696",
+        "RU_NAMESPACE": "ddosapi",
+        "RU_DBC": "postgres",
+        "RU_DB_VER": "9.5",
+        "RU_SCHEMA": "",
+        "RU_USER": "",
+        "RU_PWD": "",
+        "IF_HOST": "",
+        "IF_HOST_PORT":"8086",
+        "IF_SCHEMA": "",
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}
